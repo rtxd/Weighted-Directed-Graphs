@@ -6,7 +6,7 @@ Your task is to implement a directed_graph class, where each node/edge has a wei
 
 For example, the following weighted directed graph has five nodes { A, B, C, D, E } and seven edges { (A, B), (A, C), (B, E), (C, D), (D, A), (D, C), (D, E)}. Node C has a weight of 400, and its incident edges: (A, C) has the weight of 9; (D, C) has the weight of 7; (C, D) has the weight of 4.
 
-![alt text](https://static.edusercontent.com/files/tNgXLDUJfwIeh9aIT0dOT3ky.png)
+![alt text](https://github.com/rtxd/Weighted-Directed-Graphs/blob/master/assets/weightedGraph.png?raw=true)
 
 The class should offer a reasonably effective suite of operations. Some (but not all) of basic operations are:
 
