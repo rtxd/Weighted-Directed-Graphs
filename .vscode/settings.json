@@ -1,0 +1,10 @@
+{
+    "files.associations": {
+        "xhash": "cpp",
+        "xtree": "cpp",
+        "algorithm": "cpp",
+        "iostream": "cpp",
+        "ostream": "cpp",
+        "utility": "cpp"
+    }
+}
