@@ -12,6 +12,7 @@
 #include <utility>
 #include <algorithm>
 #include <string>
+#include <list>
 
 using namespace std;
 
@@ -53,11 +54,12 @@ public:
     size_t num_vertices() const; //Returns the total number of vertices in the graph.
     size_t num_edges() const;    //Returns the total number of edges in the graph.
 
+    vertex<T> get_vertex(const int &);
     vector<vertex<T>> get_vertices();                           //Returns a vector containing all the vertices.
     vector<vertex<T>> get_neighbours(const int &);              //Returns a vector containing all the vertices reachable from the given vertex. The vertex is not considered a neighbour of itself.
     vector<vertex<T>> get_second_order_neighbours(const int &); // Returns a vector containing all the second_order_neighbours (i.e., neighbours of neighbours) of the given vertex.
                                                                 // A vector cannot be considered a second_order_neighbour of itself.
-    bool reachable(const int &, const int &) const;             //Returns true if the second vertex is reachable from the first (can you follow a path of out-edges to get from the first to the second?). Returns false otherwise.
+    bool reachable(const int &, const int &);                   //Returns true if the second vertex is reachable from the first (can you follow a path of out-edges to get from the first to the second?). Returns false otherwise.
     bool contain_cycles() const;                                // Return true if the graph contains cycles (there is a path from any vertices directly/indirectly to itself), false otherwise.
 
     vector<vertex<T>> depth_first(const int &);   //Returns the vertices of the graph in the order they are visited in by a depth-first traversal starting at the given vertex.
@@ -99,6 +101,32 @@ bool directed_graph<T>::contains(const int &u_id)
     {
         return true;
     }
+    return false;
+}
+
+// Returns true if the second vertex is reachable from the first
+// (can you follow a path of out-edges to get from the first to the second?).
+// Returns false otherwise.
+template <typename T>
+bool directed_graph<T>::reachable(const int &u_id, const int &v_id)
+{
+
+    // Get list of all nodes accessible using depth_first
+    vector<vertex<T>> path_of_nodes = depth_first(u_id);
+    bool reachable = false;
+
+    // Go through path of nodes and look for v_id
+    for (auto x : path_of_nodes)
+    {
+        if (x.id == v_id)
+            reachable = true;
+    }
+    return reachable;
+}
+
+template <typename T>
+bool directed_graph<T>::contain_cycles() const
+{
     return false;
 }
 
@@ -170,21 +198,162 @@ vector<vertex<T>> directed_graph<T>::get_vertices()
     return v;
 }
 
-// template <typename T>
-// vector<vertex<T>> directed_graph<T>::depth_first(const int &u_id)
-// {
-//     vector<vertex<T>> v;
-//     // stack<vertex<T>> tempStack;
-//     //todo: Mark node as visited, add it to stack
+template <typename T>
+vertex<T> directed_graph<T>::get_vertex(const int &u_id)
+{
+    vertex<T> v(0, 0);
+    vector<int>
+        vertexIds;
+    if (contains(u_id))
+    {
+        for (auto x : get_vertices()) //Loop through all vertices
+        {
+            if (x.id == u_id)
+            {
+                return x;
+            }
+        }
+    }
+    return v;
+}
 
-//     //loop this until you reach a dead end
-//     //todo: explore any unvisted adjacent node, choose one and mark it as visited, add it to stack
-//     // for (auto x : vertex_weights)
-//     // {
-//     //     v.push_back(vertex<T>(x.first, x.second));
-//     // }
-//     return v;
-// }
+template <typename T>
+vector<vertex<T>> directed_graph<T>::breadth_first(const int &u_id)
+{
+
+    //Create an bool array called visited
+    bool *visited = new bool[num_vertices()];
+    for (int i = 0; i < num_vertices(); i++)
+    {
+        visited[i] = false;
+    }
+
+    //create a queue
+    queue<int> q;
+
+    //visitedNodes will be our output of the traversal
+    vector<vertex<T>> visitedNodes;
+    int currentNode = u_id;
+    visited[currentNode] = true;
+
+    // add first node to queue and visitedNodes
+    q.push(currentNode);
+
+    visitedNodes.push_back(get_vertex(currentNode));
+
+    while (!q.empty())
+    {
+        //set current node to the front of the queue
+        currentNode = q.front();
+        //dequeue that node
+        q.pop();
+
+        //go through all adjacent nodes
+        for (auto x : adj_list[currentNode])
+        {
+            // if we haven't visted a node
+            if (!visited[x.first])
+            {
+                //Enqueue this node and mark it as visited
+                visited[x.first] = true;
+                q.push(x.first);
+                visitedNodes.push_back(get_vertex(x.first));
+            }
+        }
+    }
+    return visitedNodes;
+}
+
+template <typename T>
+directed_graph<T> directed_graph<T>::out_tree(const int &u_id)
+{
+    //Returns a spanning tree of the graph starting at the given vertex using the out-edges.
+    //This means every vertex in the tree is reachable from the root.
+    // ---------------------------------------------
+
+    // Find out how many Vertexs there are (we will be creating vertex_count - 1 edges)
+    int vertex_total = num_vertices();
+
+    // Initialise
+    //   create an empty directed graph with the starting vertex
+    //     create directed graph
+    directed_graph<T> new_tree;
+    new_tree.add_vertex(get_vertex(u_id));
+    //     add_vertex(vertex(iud))
+    //   For our own tracking
+    //      Visit[ ] ; //initialize the visit array to false
+    //      Visit[starting vertex]=true ; //make starting vertex visit true
+    //      Create a list of edges available and sort by minimal weight
+    //           available_edges[]
+
+    // Loop (vertex_count -1)
+    //     Go through available_edges(u,v) in order where u in our tree and v not in our tree
+    //         Add vertex to our directed graph
+    //         Add that edge to our directed graph
+    //         Visit[v]=true
+    //         remove that edge from available edges
+    return new_tree;
+}
+
+template <typename T>
+vector<vertex<T>> directed_graph<T>::depth_first(const int &u_id)
+{
+    vector<vertex<T>> visitedNodes;
+    stack<vertex<T>> trail; //breadcrumb trail
+
+    //Add first node to stack and visited
+    vertex<T> firstNode = get_vertex(u_id);
+    trail.push(firstNode);
+    visitedNodes.push_back(firstNode);
+
+    // from this point onwards we can always tell which node we are on by trail.top
+    vertex<T> currentNode = trail.top();
+    //List of neighbours
+    vector<vertex<T>> neighbours;
+    bool stack_changed = false;
+    bool visited = false;
+
+    // While stack not empty
+    while (!trail.empty())
+    {
+        //var get_adjacent_vertexs(to trail.top)
+        stack_changed = false;
+        currentNode = trail.top();
+        neighbours = get_neighbours(currentNode.id);
+
+        //for every neighbour
+        for (auto x : neighbours)
+        {
+            visited = false;
+            // loop through visited nodes
+            for (auto y : visitedNodes)
+            {
+                // If we have visited this neigbour then set visited to true
+                if (x.id == y.id)
+                {
+                    visited = true;
+                    break;
+                }
+            }
+            // If we have not visited this neigbour then visit it by adding it to trail and visitedNodes
+            if (visited == false)
+            {
+                trail.push(x);
+                visitedNodes.push_back(x);
+                stack_changed = true;
+                break;
+            }
+        }
+        //if we get here then there where no adjacent unvisted nodes left hence we need to go back
+        //pop off last entry in stack
+        if (stack_changed == false)
+        {
+            trail.pop();
+        }
+    }
+
+    return visitedNodes;
+}
 
 template <typename T>
 void directed_graph<T>::remove_vertex(const int &u_id)

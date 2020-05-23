@@ -5,6 +5,10 @@
         "algorithm": "cpp",
         "iostream": "cpp",
         "ostream": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "vector": "cpp",
+        "stack": "cpp",
+        "queue": "cpp",
+        "list": "cpp"
     }
 }
