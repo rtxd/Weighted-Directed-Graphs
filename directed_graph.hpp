@@ -54,6 +54,7 @@ public:
     size_t num_vertices() const; //Returns the total number of vertices in the graph.
     size_t num_edges() const;    //Returns the total number of edges in the graph.
 
+    void display_tree();
     vertex<T> get_vertex(const int &);
     vector<vertex<T>> get_vertices();                           //Returns a vector containing all the vertices.
     vector<vertex<T>> get_neighbours(const int &);              //Returns a vector containing all the vertices reachable from the given vertex. The vertex is not considered a neighbour of itself.
@@ -72,6 +73,7 @@ public:
     vector<vertex<T>> post_order_traversal(const int &, directed_graph<T> &); // returns the vertices in ther visitig order of a post-order traversal of the minimum spanning tree starting at the given vertex.
 
     vector<vertex<T>> significance_sorting(); // Return a vector containing a sorted list of the vertices in descending order of their significance.
+    vector<vertex<T>> weight_sorted_edges();  // Return a edge containing a sorted list of the vertices in descending order of their significance.
 };
 
 template <typename T>
@@ -267,32 +269,97 @@ vector<vertex<T>> directed_graph<T>::breadth_first(const int &u_id)
 template <typename T>
 directed_graph<T> directed_graph<T>::out_tree(const int &u_id)
 {
-    //Returns a spanning tree of the graph starting at the given vertex using the out-edges.
-    //This means every vertex in the tree is reachable from the root.
-    // ---------------------------------------------
 
-    // Find out how many Vertexs there are (we will be creating vertex_count - 1 edges)
-    int vertex_total = num_vertices();
-
-    // Initialise
-    //   create an empty directed graph with the starting vertex
-    //     create directed graph
     directed_graph<T> new_tree;
-    new_tree.add_vertex(get_vertex(u_id));
-    //     add_vertex(vertex(iud))
-    //   For our own tracking
-    //      Visit[ ] ; //initialize the visit array to false
-    //      Visit[starting vertex]=true ; //make starting vertex visit true
-    //      Create a list of edges available and sort by minimal weight
-    //           available_edges[]
 
-    // Loop (vertex_count -1)
-    //     Go through available_edges(u,v) in order where u in our tree and v not in our tree
-    //         Add vertex to our directed graph
-    //         Add that edge to our directed graph
-    //         Visit[v]=true
-    //         remove that edge from available edges
+    //Create an bool array called visited
+    bool *visited = new bool[num_vertices()];
+    for (int i = 0; i < num_vertices(); i++)
+    {
+        visited[i] = false;
+    }
+
+    //create a queue
+    queue<int> q;
+
+    //visitedNodes will be our output of the traversal
+    vector<vertex<T>> visitedNodes;
+    int currentNode = u_id;
+    visited[currentNode] = true;
+
+    // add first node to queue and visitedNodes
+    q.push(currentNode);
+    new_tree.add_vertex(get_vertex(u_id)); //start creating tree
+
+    visitedNodes.push_back(get_vertex(currentNode));
+
+    // Keep track of lowest weight edge found
+    bool valid_edge_available = false;
+    int valid_edge_lowest_weight_vertex;
+
+    double edge_weight;
+
+    while (!q.empty())
+    {
+        //set current node to the front of the queue
+
+        currentNode = q.front();
+        //dequeue that node
+        q.pop();
+
+        //go through all adjacent nodes
+        for (auto x : adj_list[currentNode])
+        {
+
+            // keep track of lowest weight vertex
+            valid_edge_available = false;
+            valid_edge_lowest_weight_vertex = 0;
+
+            // if we haven't visted a node
+            if (!visited[x.first])
+            {
+                //Enqueue this node and mark it as visited
+                visited[x.first] = true;
+                q.push(x.first);
+                visitedNodes.push_back(get_vertex(x.first));
+
+                new_tree.add_vertex(get_vertex(x.first));
+
+                for (auto z : adj_list)
+                {
+                    for (auto y : z.second)
+                    {
+                        if (z.first == x.first)
+                        {
+                            edge_weight == y.second;
+                            cout << y.second << endl;
+                        }
+                    }
+                }
+
+                new_tree.add_edge(currentNode, x.first, edge_weight);
+
+                // get_vertex(x.first).weight
+            }
+        }
+    }
     return new_tree;
+}
+
+template <typename T>
+void directed_graph<T>::display_tree()
+{
+    cout << "display tree:" << endl;
+
+    for (auto node : adj_list)
+    {
+        cout << "  Vertex: " << node.first << endl;
+        for (auto edge : node.second)
+        {
+            cout << "    Edge Destination (edge.first): " << edge.first << endl;
+            cout << "    Edge Weight (edge.second): " << edge.second << endl;
+        }
+    }
 }
 
 template <typename T>

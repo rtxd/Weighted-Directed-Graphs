@@ -86,6 +86,7 @@ int main()
     cout << "number of vertices: " << directedGraph2.num_vertices() << endl;
     cout << "number of edges: " << directedGraph2.num_edges() << endl;
 
+    directedGraph1.display_tree();
     system("pause");
     return 0;
 }
