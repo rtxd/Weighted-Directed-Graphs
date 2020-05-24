@@ -56,8 +56,10 @@ public:
 
     void display_tree();
     vertex<T> get_vertex(const int &);
-    vector<vertex<T>> get_vertices();                           //Returns a vector containing all the vertices.
-    vector<vertex<T>> get_neighbours(const int &);              //Returns a vector containing all the vertices reachable from the given vertex. The vertex is not considered a neighbour of itself.
+    vector<vertex<T>> get_vertices();                                  //Returns a vector containing all the vertices.
+    vector<vertex<T>> get_neighbours(const int &);                     //Returns a vector containing all the vertices reachable from the given vertex. The vertex is not considered a neighbour of itself.
+    vector<vertex<T>> get_neighbours_sort_by_edge_weight(const int &); //Returns a vector containing all the vertices reachable from the given vertex. The vertex is not considered a neighbour of itself.
+
     vector<vertex<T>> get_second_order_neighbours(const int &); // Returns a vector containing all the second_order_neighbours (i.e., neighbours of neighbours) of the given vertex.
                                                                 // A vector cannot be considered a second_order_neighbour of itself.
     bool reachable(const int &, const int &);                   //Returns true if the second vertex is reachable from the first (can you follow a path of out-edges to get from the first to the second?). Returns false otherwise.
@@ -133,6 +135,9 @@ bool directed_graph<T>::contain_cycles()
     //Bool containsCycle (var that we return)
     bool containsCycle = false;
 
+    // Loop through every node to check if they have a cycle
+    // the reason we do this is because a single node that may not be attatched to the main graph
+    // main contain an edge linking to itself and hence will make a cycle true
     for (int i = 0; i < num_vertices(); i++)
     {
         containsCycle = does_node_contain_cycle(get_vertices()[i].id);
@@ -210,6 +215,7 @@ bool directed_graph<T>::does_node_contain_cycle(int &u_id)
 template <typename T>
 bool directed_graph<T>::adjacent(const int &u_id, const int &v_id)
 {
+    //Goes through the adjacent list, if it finds a match then return true
     if (adj_list[u_id].find(v_id) != adj_list[u_id].end())
     {
         return true;
@@ -281,7 +287,7 @@ vertex<T> directed_graph<T>::get_vertex(const int &u_id)
 {
     vertex<T> v(0, 0);
     vector<int> vertexIds;
-    if (contains(u_id))
+    if (contains(u_id)) //Check if we have that ID
     {
         for (auto x : get_vertices()) //Loop through all vertices
         {
@@ -346,7 +352,7 @@ vector<vertex<T>> directed_graph<T>::breadth_first(const int &u_id)
 template <typename T>
 directed_graph<T> directed_graph<T>::out_tree(const int &u_id)
 {
-
+    // Declare a new tree, this is what we will return
     directed_graph<T> new_tree;
 
     //Create an bool array called visited
@@ -357,7 +363,7 @@ directed_graph<T> directed_graph<T>::out_tree(const int &u_id)
     }
 
     //create a queue
-    queue<int> q;
+    queue<int> node_queue;
 
     //visitedNodes will be our output of the traversal
     vector<vertex<T>> visitedNodes;
@@ -365,7 +371,7 @@ directed_graph<T> directed_graph<T>::out_tree(const int &u_id)
     visited[currentNode] = true;
 
     // add first node to queue and visitedNodes
-    q.push(currentNode);
+    node_queue.push(currentNode);
     new_tree.add_vertex(get_vertex(u_id)); //start creating tree
 
     visitedNodes.push_back(get_vertex(currentNode));
@@ -376,13 +382,13 @@ directed_graph<T> directed_graph<T>::out_tree(const int &u_id)
 
     double edge_weight;
 
-    while (!q.empty())
+    while (!node_queue.empty())
     {
         //set current node to the front of the queue
 
-        currentNode = q.front();
+        currentNode = node_queue.front();
         //dequeue that node
-        q.pop();
+        node_queue.pop();
 
         //go through all adjacent nodes
         for (auto adjacentNode : adj_list[currentNode])
@@ -398,7 +404,7 @@ directed_graph<T> directed_graph<T>::out_tree(const int &u_id)
                 edge_weight = adjacentNode.second;
                 //Enqueue this node and mark it as visited
                 visited[adjacentNode.first] = true;
-                q.push(adjacentNode.first);
+                node_queue.push(adjacentNode.first);
                 visitedNodes.push_back(get_vertex(adjacentNode.first));
 
                 new_tree.add_vertex(get_vertex(adjacentNode.first));
@@ -409,6 +415,7 @@ directed_graph<T> directed_graph<T>::out_tree(const int &u_id)
     return new_tree;
 }
 
+// Function to display a full tree
 template <typename T>
 void directed_graph<T>::display_tree()
 {
@@ -429,37 +436,37 @@ template <typename T>
 vector<vertex<T>> directed_graph<T>::depth_first(const int &u_id)
 {
     vector<vertex<T>> visitedNodes;
-    stack<vertex<T>> trail; //breadcrumb trail
+    stack<vertex<T>> node_stack; //breadcrumb trail a.k.a the stack used to keep track of what we are visiting
 
     //Add first node to stack and visited
     vertex<T> firstNode = get_vertex(u_id);
-    trail.push(firstNode);
+    node_stack.push(firstNode);
     visitedNodes.push_back(firstNode);
 
-    // from this point onwards we can always tell which node we are on by trail.top
-    vertex<T> currentNode = trail.top();
+    // from this point onwards we can always tell which node we are on by node_stack.top
+    vertex<T> currentNode = node_stack.top();
     //List of neighbours
     vector<vertex<T>> neighbours;
     bool stack_changed = false;
     bool visited = false;
 
     // While stack not empty
-    while (!trail.empty())
+    while (!node_stack.empty())
     {
-        //var get_adjacent_vertexs(to trail.top)
         stack_changed = false;
-        currentNode = trail.top();
+        currentNode = node_stack.top();
+        //Get all children/neighbours of the current node
         neighbours = get_neighbours(currentNode.id);
 
         //for every neighbour
-        for (auto x : neighbours)
+        for (auto neighbour : neighbours)
         {
             visited = false;
             // loop through visited nodes
-            for (auto y : visitedNodes)
+            for (auto visitedNode : visitedNodes)
             {
                 // If we have visited this neigbour then set visited to true
-                if (x.id == y.id)
+                if (neighbour.id == visitedNode.id)
                 {
                     visited = true;
                     break;
@@ -468,8 +475,8 @@ vector<vertex<T>> directed_graph<T>::depth_first(const int &u_id)
             // If we have not visited this neigbour then visit it by adding it to trail and visitedNodes
             if (visited == false)
             {
-                trail.push(x);
-                visitedNodes.push_back(x);
+                node_stack.push(neighbour);
+                visitedNodes.push_back(neighbour);
                 stack_changed = true;
                 break;
             }
@@ -478,7 +485,7 @@ vector<vertex<T>> directed_graph<T>::depth_first(const int &u_id)
         //pop off last entry in stack
         if (stack_changed == false)
         {
-            trail.pop();
+            node_stack.pop();
         }
     }
 
@@ -495,10 +502,6 @@ void directed_graph<T>::remove_vertex(const int &u_id)
         x.second.erase(u_id); // x.second == unordered_map<int, T>
     }
 }
-
-/*
-	part 2: add, check, remove edge
-*/
 
 template <typename T>
 void directed_graph<T>::add_edge(const int &u_id, const int &v_id, const T &uv_weight)
@@ -542,20 +545,35 @@ vector<vertex<T>> directed_graph<T>::get_neighbours(const int &u_id)
 }
 
 template <typename T>
+vector<vertex<T>> directed_graph<T>::get_neighbours_sort_by_edge_weight(const int &u_id)
+{
+    vector<vertex<T>> v;
+    if (contains(u_id))
+    { // first make sure the vertex is in the graph
+        for (auto x : adj_list[u_id])
+        { // adj_list[u_id] is an unordered_map<int, T>
+            v.push_back(vertex<T>(x.first, vertex_weights[x.first]));
+        }
+    }
+    return v;
+}
+
+template <typename T>
 vector<vertex<T>> directed_graph<T>::get_second_order_neighbours(const int &u_id)
 {
     vector<vertex<T>> v;
     vector<int> vertexIds;
     if (contains(u_id)) // first make sure the vertex is in the graph
     {
-        for (auto x : get_neighbours(u_id)) //loops through the neighbours
+        for (auto neighbour : get_neighbours(u_id)) //loops through the neighbours
         {
-            for (auto y : get_neighbours(x.id))
+            for (auto second_order_neighbour : get_neighbours(neighbour.id))
             {
-                if (find(vertexIds.begin(), vertexIds.end(), y.id) == vertexIds.end() && u_id != y.id)
+                // u_id can not be a second order neighbour of itself
+                if (find(vertexIds.begin(), vertexIds.end(), second_order_neighbour.id) == vertexIds.end() && u_id != second_order_neighbour.id)
                 {
-                    v.push_back(y);
-                    vertexIds.push_back(y.id);
+                    v.push_back(second_order_neighbour);
+                    vertexIds.push_back(second_order_neighbour.id);
                 }
             }
         }
@@ -569,46 +587,46 @@ vector<vertex<T>> directed_graph<T>::pre_order_traversal(const int &u_id, direct
     //We are given a vertex
     // Root/Left/Right
     vector<vertex<T>> visitedNodes;
-    stack<vertex<T>> trail; //breadcrumb trail
+    stack<vertex<T>> node_stack; //breadcrumb trail
 
-    //Add first node to stack and visited
+    //Add root to stack and visited list
     vertex<T> root = get_vertex(u_id);
-    trail.push(root);
+    node_stack.push(root);
     visitedNodes.push_back(root);
 
-    // from this point onwards we can always tell which node we are on by trail.top
-    vertex<T> currentNode = trail.top();
-    //List of neighbours
-    vector<vertex<T>> neighbours;
+    // from this point onwards we can always tell which node we are on by node_stack.top
+    vertex<T> currentNode = node_stack.top();
+    //List of chilrden
+    vector<vertex<T>> vector_of_children;
     bool stack_changed = false;
     bool visited = false;
 
     // While stack not empty
-    while (!trail.empty())
+    while (!node_stack.empty())
     {
         stack_changed = false;
-        currentNode = trail.top();
-        neighbours = get_neighbours(currentNode.id);
+        currentNode = node_stack.top();
+        vector_of_children = get_neighbours(currentNode.id);
 
-        //for every neighbour
-        for (auto neighbour : neighbours)
+        //for every child
+        for (auto child : vector_of_children)
         {
             visited = false;
             // loop through visited nodes
-            for (auto y : visitedNodes)
+            for (auto visited_node : visitedNodes)
             {
-                // If we have visited this neigbour then set visited to true
-                if (neighbour.id == y.id)
+                // If we have visited this child then set visited to true
+                if (child.id == visited_node.id)
                 {
                     visited = true;
                     break;
                 }
             }
-            // If we have not visited this neigbour then visit it by adding it to trail and visitedNodes
+            // If we have not visited this child then visit it by adding it to stack and visitedNodes
             if (visited == false)
             {
-                trail.push(neighbour);
-                visitedNodes.push_back(neighbour);
+                node_stack.push(child);
+                visitedNodes.push_back(child);
                 stack_changed = true;
                 break;
             }
@@ -617,67 +635,59 @@ vector<vertex<T>> directed_graph<T>::pre_order_traversal(const int &u_id, direct
         //pop off last entry in stack
         if (stack_changed == false)
         {
-            trail.pop();
+            node_stack.pop();
         }
     }
-
     return visitedNodes;
-
-    // Check that there are no children and just return root
-
-    // v.push_back(vertex<T>(x.first, x.second));
 }
 
 template <typename T>
 vector<vertex<T>> directed_graph<T>::post_order_traversal(const int &u_id, directed_graph<T> &tree)
 {
-    //We are given a vertex
-    // Left/Root/Right
+    // Left/Right/Root
     vector<vertex<T>> visitedNodes;
-    stack<vertex<T>> trail; //breadcrumb trail
+    stack<vertex<T>> node_stack; //breadcrumb trail
 
-    //Add first node to stack and visited
+    //Add root node to stack but not visited list
     vertex<T> root = get_vertex(u_id);
-    trail.push(root);
-    //visitedNodes.push_back(root);
+    node_stack.push(root);
 
-    // from this point onwards we can always tell which node we are on by trail.top
-    vertex<T> currentNode = trail.top();
-    //List of neighbours
-    vector<vertex<T>> neighbours;
+    // from this point onwards we can always tell which node we are on by node_stack.top
+    vertex<T> current_node = node_stack.top();
+    //List of children
+    vector<vertex<T>> children;
     bool stack_changed = false;
     bool visited = false;
     bool reachedBottom = false;
 
     // While stack not empty
-    while (!trail.empty())
+    while (!node_stack.empty())
     {
         stack_changed = false;
-        currentNode = trail.top();
-        neighbours = get_neighbours(currentNode.id);
+        current_node = node_stack.top();
+        children = get_neighbours(current_node.id);
 
-        if (neighbours.empty())
+        // if there are no more children then we have reached the bottom of the tree
+        if (children.empty())
             reachedBottom = true;
-        //for every neighbour
-        for (auto neighbour : neighbours)
+        //for every child
+        for (auto child : children)
         {
             visited = false;
             // loop through visited nodes
-            for (auto visitedNode : visitedNodes)
+            for (auto visited_node : visitedNodes)
             {
                 // If we have visited this neigbour then set visited to true
-                if (neighbour.id == visitedNode.id)
+                if (child.id == visited_node.id)
                 {
                     visited = true;
                     break;
                 }
             }
-            // If we have not visited this neigbour then visit it by adding it to trail and visitedNodes
+            // If we have not visited this child then visit it by adding it to stack
             if (visited == false)
             {
-                trail.push(neighbour);
-                //If reached the bottom start marking where we've visited
-
+                node_stack.push(child);
                 stack_changed = true;
                 break;
             }
@@ -687,8 +697,8 @@ vector<vertex<T>> directed_graph<T>::post_order_traversal(const int &u_id, direc
         if (stack_changed == false)
         {
             if (reachedBottom)
-                visitedNodes.push_back(trail.top());
-            trail.pop();
+                visitedNodes.push_back(node_stack.top());
+            node_stack.pop();
         }
     }
 
@@ -701,7 +711,7 @@ vector<vertex<T>> directed_graph<T>::in_order_traversal(const int &u_id, directe
     //We are given a vertex
     // Left/Root/Right
     vector<vertex<T>> visitedNodes;
-    stack<vertex<T>> trail; //breadcrumb trail
+    stack<vertex<T>> node_stack; //breadcrumb trail
 
     //Array Status that keeps track of nodes that have been passed
     // if a node is passed twice it's a parent node and needs to be marked as visited
@@ -714,30 +724,30 @@ vector<vertex<T>> directed_graph<T>::in_order_traversal(const int &u_id, directe
         status[i] = 0;
     }
 
-    //Add first node to stack and visited
+    //Add root to stack
     vertex<T> root = get_vertex(u_id);
-    trail.push(root);
+    node_stack.push(root);
 
-    // from this point onwards we can always tell which node we are on by trail.top
-    vertex<T> currentNode = trail.top();
-    //List of neighbours
-    vector<vertex<T>> neighbours;
+    // from this point onwards we can always tell which node we are on by node_stack.top
+    vertex<T> currentNode = node_stack.top();
+    //List of children
+    vector<vertex<T>> children;
     bool stack_changed = false;
     bool visited = false;
     bool reachedBottom = false;
 
     // While stack not empty
-    while (!trail.empty())
+    while (!node_stack.empty())
     {
         reachedBottom = false;
         stack_changed = false;
-        currentNode = trail.top();
-        neighbours = get_neighbours(currentNode.id);
+        currentNode = node_stack.top();
+        children = get_neighbours(currentNode.id);
 
-        if (neighbours.empty())
+        if (children.empty())
             reachedBottom = true;
-        //for every neighbour
-        for (auto neighbour : neighbours)
+        //for every child
+        for (auto child : children)
         {
             //Update parents status
             switch (status[currentNode.id])
@@ -760,21 +770,19 @@ vector<vertex<T>> directed_graph<T>::in_order_traversal(const int &u_id, directe
 
             visited = false;
             // loop through visited nodes
-            for (auto visitedNode : visitedNodes)
+            for (auto visited_node : visitedNodes)
             {
                 // If we have visited this neigbour then set visited to true
-                if (neighbour.id == visitedNode.id)
+                if (child.id == visited_node.id)
                 {
                     visited = true;
                     break;
                 }
             }
-            // If we have not visited this neigbour then visit it by adding it to trail and visitedNodes
+            // If we have not visited this neigbour then visit it by adding it to trail
             if (visited == false)
             {
-                trail.push(neighbour);
-                //If reached the bottom start marking where we've visited
-
+                node_stack.push(child);
                 stack_changed = true;
                 break;
             }
@@ -783,9 +791,10 @@ vector<vertex<T>> directed_graph<T>::in_order_traversal(const int &u_id, directe
         //pop off last entry in stack
         if (stack_changed == false)
         {
+            // if we are at the bottom then add this node to visited nodes
             if (reachedBottom)
-                visitedNodes.push_back(trail.top());
-            trail.pop();
+                visitedNodes.push_back(node_stack.top());
+            node_stack.pop();
         }
     }
 
@@ -795,28 +804,29 @@ vector<vertex<T>> directed_graph<T>::in_order_traversal(const int &u_id, directe
 template <typename T>
 vector<vertex<T>> directed_graph<T>::significance_sorting()
 {
-    vector<vertex<T>> v;
+    // To sort, i've done a quick bubble sort on the vertices, comparing their weights
+    vector<vertex<T>> vector_of_nodes;
     int temp_index;
     double temp_weight;
 
     for (auto x : vertex_weights)
     {
-        v.push_back(vertex<T>(x.first, x.second));
+        vector_of_nodes.push_back(vertex<T>(x.first, x.second));
     }
     int i, j;
     //Bubble Sort on Vertices
-    for (i = 0; i < v.size() - 1; i++)
-        for (j = 0; j < v.size() - i - 1; j++)
-            if (v[j].weight > v[j + 1].weight)
+    for (i = 0; i < vector_of_nodes.size() - 1; i++)
+        for (j = 0; j < vector_of_nodes.size() - i - 1; j++)
+            if (vector_of_nodes[j].weight > vector_of_nodes[j + 1].weight)
             {
-                temp_index = v[j].id;
-                temp_weight = v[j].weight;
-                v[j].id = v[j + 1].id;
-                v[j].weight = v[j + 1].weight;
-                v[j + 1].id = temp_index;
-                v[j + 1].weight = temp_weight;
+                temp_index = vector_of_nodes[j].id;
+                temp_weight = vector_of_nodes[j].weight;
+                vector_of_nodes[j].id = vector_of_nodes[j + 1].id;
+                vector_of_nodes[j].weight = vector_of_nodes[j + 1].weight;
+                vector_of_nodes[j + 1].id = temp_index;
+                vector_of_nodes[j + 1].weight = temp_weight;
             }
-    return v;
+    return vector_of_nodes;
 }
 
 #endif
