@@ -9,6 +9,17 @@
         "vector": "cpp",
         "stack": "cpp",
         "queue": "cpp",
-        "list": "cpp"
+        "list": "cpp",
+        "xlocale": "cpp",
+        "array": "cpp",
+        "deque": "cpp",
+        "forward_list": "cpp",
+        "initializer_list": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "unordered_map": "cpp",
+        "unordered_set": "cpp",
+        "xstring": "cpp",
+        "xutility": "cpp"
     }
 }

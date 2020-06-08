@@ -70,12 +70,14 @@ public:
     vector<vertex<T>> breadth_first(const int &); //Returns the vertices of the graph in the order they are visisted in by a breadth-first traversal starting at the given vertex.
 
     directed_graph<T> out_tree(const int &); //Returns a spanning tree of the graph starting at the given vertex using the out-edges. This means every vertex in the tree is reachable from the root.
+    directed_graph<T> getTransposeGraph();   //Returns the transpose graph of this graph.
 
     vector<vertex<T>> pre_order_traversal(const int &, directed_graph<T> &);  // returns the vertices in the visiting order of a pre-order traversal of the minimum spanning tree starting at the given vertex.
     vector<vertex<T>> in_order_traversal(const int &, directed_graph<T> &);   // returns the vertices in the visiting order of an in-order traversal of the minimum spanning tree starting at the given vertex.
     vector<vertex<T>> post_order_traversal(const int &, directed_graph<T> &); // returns the vertices in ther visitig order of a post-order traversal of the minimum spanning tree starting at the given vertex.
 
     vector<vertex<T>> significance_sorting(); // Return a vector containing a sorted list of the vertices in descending order of their significance.
+    void fillOrder(int &, bool[], stack<int> &);
 };
 
 template <typename T>
@@ -174,7 +176,6 @@ bool directed_graph<T>::does_node_contain_cycle(int &u_id)
     // While stack not empty
     while (!nodeStack.empty())
     {
-        //var get_adjacent_vertexs(to nodeStack.back)
         stack_changed = false;
         currentNode = nodeStack.back();
         neighbourList = get_neighbours(currentNode);
@@ -376,10 +377,6 @@ directed_graph<T> directed_graph<T>::out_tree(const int &u_id)
 
     visitedNodes.push_back(get_vertex(currentNode));
 
-    // Keep track of lowest weight edge found
-    bool valid_edge_available = false;
-    int valid_edge_lowest_weight_vertex;
-
     double edge_weight;
 
     while (!node_queue.empty())
@@ -393,10 +390,6 @@ directed_graph<T> directed_graph<T>::out_tree(const int &u_id)
         //go through all adjacent nodes
         for (auto adjacentNode : adj_list[currentNode])
         {
-
-            // keep track of lowest weight vertex
-            valid_edge_available = false;
-            valid_edge_lowest_weight_vertex = 0;
 
             // if we haven't visted a node
             if (!visited[adjacentNode.first])
@@ -827,6 +820,75 @@ vector<vertex<T>> directed_graph<T>::significance_sorting()
                 vector_of_nodes[j + 1].weight = temp_weight;
             }
     return vector_of_nodes;
+}
+
+template <typename T>
+directed_graph<T> directed_graph<T>::getTransposeGraph()
+{
+    directed_graph<T> transposeGraph;
+
+    // Populate graph with vertex's
+    for (auto x : adj_list)
+    {
+        transposeGraph.add_vertex(vertex<T>(x.first, 0));
+    }
+
+    for (auto v : adj_list)
+    {
+        for (auto edge : v.second)
+        {
+            transposeGraph.add_edge(edge.first, v.first, edge.second);
+        }
+    }
+
+    return transposeGraph;
+}
+
+template <typename T>
+void directed_graph<T>::fillOrder(int &startNode, bool visitedNodes[], stack<int> &nodeStack)
+// void Graph::fillOrder(int v, bool visited[], stack<int> &Stack)
+{
+
+    cout << "fillOrder: startnode = " << startNode << endl;
+
+    // Mark the current node as visited and print it
+    visitedNodes[startNode] = true;
+
+    // Recur for all the vertices adjacent to this vertex
+    // list<int>::iterator i;
+    // cout << "adjList [startnode]" << adj_list.begin()->first << endl;
+
+    // for (auto node : adj_list)
+    // {
+    //     if(node we want)
+    //     {
+
+    //     }
+    //     cout << node.first << endl;
+    // }
+    vector<vertex<T>> children = get_neighbours(startNode);
+
+    for (int i = 0; i < children.size(); i++)
+    {
+        cout << children[i].id << endl;
+        if (!visitedNodes[*i])
+            fillOrder(*i, visitedNodes, nodeStack);
+    }
+
+    // for (auto child : children)
+    // {
+    //     cout << child.id << endl;
+    // }
+
+    // for (i = adj_list[startNode].begin()->first; i != adj_list[startNode].end()->first; ++i)
+
+    // for (i = adj[v].begin(); i != adj[v].end(); ++i)
+    // for (i = adj_list[startNode].begin(); i != adj_list[startNode].end(); ++i)
+    //     if (!visitedNodes[*i])
+    //         fillOrder(*i, visitedNodes, nodeStack);
+
+    // // All vertices reachable from v are processed by now, push v
+    // nodeStack.push(v);
 }
 
 #endif
