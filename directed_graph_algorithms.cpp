@@ -93,7 +93,7 @@ vector<vector<vertex<T>>> strongly_connected_components(directed_graph<T> &graph
     vector<int> nodeVertexMap;
     for (int i = 0; i < V; i++)
     {
-        nodeVertexMap[i] = gt.get_vertices()[i].id;
+        nodeVertexMap.push_back(gt.get_vertices()[i].id);
         cout << "i: " << i << "    value: " << gt.get_vertices()[i].id << endl;
     }
 
@@ -102,12 +102,15 @@ vector<vector<vertex<T>>> strongly_connected_components(directed_graph<T> &graph
     for (int i = 0; i < V; i++)
     { //array find value StackTop
         int stackTop = Stack.top();
+        cout << "stacktop" << stackTop << endl;
 
-        auto iterator = find(nodeVertexMap.begin(), nodeVertexMap.end(), stackTop);
+        vector<int>::iterator it = find(nodeVertexMap.begin(), nodeVertexMap.end(), stackTop);
         //tempNodeStack.push(iterator);
         //cout << "tempNodeStack(push): " << tempNodeStack.top() << endl;
-        cout << "tempNodeStack(push): " << iterator - nodeVertexMap.begin() << endl;
+        cout << "tempNodeStack(push): " << distance(nodeVertexMap.begin(), it) << endl;
+        tempNodeStack.push(distance(nodeVertexMap.begin(), it));
 
+        Stack.pop();
         // Basically we need to iterate over all the elements of vector and check if given elements exists or not.
         // This can be done in a single line using std::find i.e.
         // Eg. Check if element 22 exists in vector
@@ -117,11 +120,23 @@ vector<vector<vertex<T>>> strongly_connected_components(directed_graph<T> &graph
         //vector<int>::iterator it = find(nodeVertexMap.begin(), nodeVertexMap.end(), stackTop);
     }
 
-    //   -----------------------------
-    while (!Stack.empty())
+    cout << "new" << endl;
+    // push tempNodeStack into nodeStack
+    for (int j = 0; j < V; j++)
     {
-        int node = Stack.top();
-        Stack.pop();
+        // cout << "hello world ;)" << endl;
+        int somerandomname = tempNodeStack.top();
+        // cout << somerandomname << endl;
+        nodeStack.push(somerandomname);
+        tempNodeStack.pop();
+        // cout << "nodeStack" << nodeStack.top() << endl;
+    }
+
+    //   -----------------------------
+    while (!nodeStack.empty())
+    {
+        int node = nodeStack.top();
+        nodeStack.pop();
 
         if (!visited[node])
         {

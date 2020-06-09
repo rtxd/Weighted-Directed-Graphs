@@ -900,52 +900,52 @@ void directed_graph<T>::fillOrder(int &startNode, bool visitedNodes[], stack<int
 template <typename T>
 void directed_graph<T>::DFSUtil(int &startNode, bool visitedNodes[])
 {
-    cout << "DFSUtil (startNode= n" << startNode << ", visitedNodes)" << endl;
+    // cout << "DFSUtil (startNode= n" << startNode << ", visitedNodes)" << endl;
     int V = get_vertices().size();
-    cout << "   #Vertices:" << V << endl;
+    // cout << "   #Vertices:" << V << endl;
 
     vector<vertex<T>> verticesInGraph = get_vertices();
 
-    cout << "    visitedNodes:   " << endl;
-    for (int i = 0; i < V; i++)
-    {
-        cout << "                n" << visitedNodes[i] << endl;
-    }
+    // cout << "    visitedNodes:   " << endl;
+    // for (int i = 0; i < V; i++)
+    // {
+    // cout << "                n" << visitedNodes[i] << endl;
+    // }
 
     // Mark current node as visited
     visitedNodes[startNode] = true;
-    cout << "set visted to true" << endl;
-    cout << "v" << verticesInGraph[startNode].id << ", " << endl;
-    cout << "Print out node" << endl;
+    // cout << "set visted to true" << endl;
+    cout << "v" << verticesInGraph[startNode].id << ", ";
+    // cout << "Print out node" << endl;
 
     vector<vertex<T>> children = get_neighbours(verticesInGraph[startNode].id);
-    cout << "has " << children.size() << " amount of children" << endl;
+    // cout << "has " << children.size() << " amount of children" << endl;
 
-    cout << "Print all children: " << endl;
+    // cout << "Print all children: " << endl;
+    // for (int i = 0; i < children.size(); i++)
+    // {
+    //     cout << "v" << children[i].id << endl;
+    // }
+
     for (int i = 0; i < children.size(); i++)
     {
-        cout << "v" << children[i].id << endl;
-    }
-
-    for (int i = 0; i < children.size(); i++)
-    {
-        cout << "has unvisited child? ";
+        // cout << "has unvisited child? ";
         for (int j = 0; j < V; j++)
         {
             if (children[i].id == verticesInGraph[j].id)
             {
-                cout << "nj: " << j << endl;
-                cout << "Child id == verticesInGraph.id    : " << children[i].id << " == " << verticesInGraph[j].id << endl;
+                // cout << "nj: " << j << endl;
+                // cout << "Child id == verticesInGraph.id    : " << children[i].id << " == " << verticesInGraph[j].id << endl;
                 if (!visitedNodes[j])
                 {
-                    cout << "true" << endl;
-                    cout << "visiting: n" << j << endl;
+                    // cout << "true" << endl;
+                    // cout << "visiting: n" << j << endl;
                     DFSUtil(j, visitedNodes);
                 }
-                else
-                {
-                    cout << "false" << endl;
-                }
+                // else
+                // {
+                //     cout << "false" << endl;
+                // }
             }
         }
     }
