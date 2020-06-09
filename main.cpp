@@ -195,19 +195,19 @@ int main()
     // dg4.add_edge(4, 5, 1);
     // dg4.add_edge(5, 2, 1);
 
-    directed_graph<double> dg5;
+    // directed_graph<double> dg5;
 
-    dg5.add_vertex(vertex<double>(1, 1));
-    dg5.add_vertex(vertex<double>(2, 1));
-    dg5.add_vertex(vertex<double>(3, 1));
-    dg5.add_vertex(vertex<double>(4, 1));
-    dg5.add_vertex(vertex<double>(5, 1));
+    // dg5.add_vertex(vertex<double>(1, 1));
+    // dg5.add_vertex(vertex<double>(2, 1));
+    // dg5.add_vertex(vertex<double>(3, 1));
+    // dg5.add_vertex(vertex<double>(4, 1));
+    // dg5.add_vertex(vertex<double>(5, 1));
 
-    dg5.add_edge(1, 2, 1);
-    dg5.add_edge(3, 1, 1);
-    dg5.add_edge(2, 3, 1);
-    dg5.add_edge(3, 4, 1);
-    dg5.add_edge(3, 5, 1);
+    // dg5.add_edge(1, 2, 1);
+    // dg5.add_edge(3, 1, 1);
+    // dg5.add_edge(2, 3, 1);
+    // dg5.add_edge(3, 4, 1);
+    // dg5.add_edge(3, 5, 1);
 
     // directed_graph<double> dg6;
 
@@ -226,12 +226,40 @@ int main()
 
     // cout << "dg3 contain cycles: " << dg3.contain_cycles() << endl;
     // cout << "dg4 contain cycles: " << dg4.contain_cycles() << endl;
-    cout << "dg5 contain cycles: " << dg5.contain_cycles() << endl;
+    // cout << "dg5 contain cycles: " << dg5.contain_cycles() << endl;
     // cout << "dg6 contain cycles: " << dg6.contain_cycles() << endl;
 
     // cout << "reachable: " << directedGraph2.reachable(1, 1) << endl;
 
-    strongly_connected_components(dg5);
+    directed_graph<double> dgSCC;
+
+    dgSCC.add_vertex(vertex<double>(1, 1));
+    dgSCC.add_vertex(vertex<double>(2, 1));
+    dgSCC.add_vertex(vertex<double>(3, 1));
+    dgSCC.add_vertex(vertex<double>(4, 1));
+    dgSCC.add_vertex(vertex<double>(5, 1));
+    dgSCC.add_vertex(vertex<double>(6, 1));
+    dgSCC.add_vertex(vertex<double>(7, 1));
+    dgSCC.add_vertex(vertex<double>(8, 1));
+    dgSCC.add_vertex(vertex<double>(9, 1));
+    dgSCC.add_vertex(vertex<double>(10, 1));
+    dgSCC.add_vertex(vertex<double>(11, 1));
+
+    dgSCC.add_edge(1, 2, 1);
+    dgSCC.add_edge(2, 3, 1);
+    dgSCC.add_edge(3, 1, 1);
+    dgSCC.add_edge(2, 4, 1);
+    dgSCC.add_edge(4, 5, 1);
+    dgSCC.add_edge(5, 6, 1);
+    dgSCC.add_edge(6, 4, 1);
+    dgSCC.add_edge(7, 6, 1);
+    dgSCC.add_edge(7, 8, 1);
+    dgSCC.add_edge(8, 9, 1);
+    dgSCC.add_edge(9, 10, 1);
+    dgSCC.add_edge(10, 7, 1);
+    dgSCC.add_edge(10, 11, 1);
+
+    strongly_connected_components(dgSCC);
     system("pause");
     return 0;
 }

@@ -20,6 +20,7 @@
         "unordered_map": "cpp",
         "unordered_set": "cpp",
         "xstring": "cpp",
-        "xutility": "cpp"
+        "xutility": "cpp",
+        "type_traits": "cpp"
     }
 }

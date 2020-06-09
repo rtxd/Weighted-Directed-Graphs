@@ -846,49 +846,47 @@ directed_graph<T> directed_graph<T>::getTransposeGraph()
 
 template <typename T>
 void directed_graph<T>::fillOrder(int &startNode, bool visitedNodes[], stack<int> &nodeStack)
-// void Graph::fillOrder(int v, bool visited[], stack<int> &Stack)
 {
 
-    cout << "fillOrder: startnode = " << startNode << endl;
-
     // Mark the current node as visited and print it
+    int V = get_vertices().size();
+    vector<vertex<T>> verticesInGraph = get_vertices();
+    for (int i = 0; i < V; i++)
+    {
+        cout << visitedNodes[i] << endl;
+    }
+
+    //Set this visted = true
     visitedNodes[startNode] = true;
 
-    // Recur for all the vertices adjacent to this vertex
-    // list<int>::iterator i;
-    // cout << "adjList [startnode]" << adj_list.begin()->first << endl;
+    cout << "set visted to true" << endl;
 
-    // for (auto node : adj_list)
-    // {
-    //     if(node we want)
-    //     {
-
-    //     }
-    //     cout << node.first << endl;
-    // }
     vector<vertex<T>> children = get_neighbours(startNode);
+    cout << "has " << children.size() << " amount of children" << endl;
 
     for (int i = 0; i < children.size(); i++)
     {
-        cout << children[i].id << endl;
-        if (!visitedNodes[*i])
-            fillOrder(*i, visitedNodes, nodeStack);
+        cout << "has unvisited child? ";
+        for (int j = 0; j < V; j++)
+            if (children[i].id == verticesInGraph[j].id)
+            {
+                cout << "j: " << j << endl;
+                if (!visitedNodes[j])
+                {
+                    cout << "true" << endl;
+                    fillOrder(j, visitedNodes, nodeStack);
+                }
+                else
+                {
+                    cout << "false" << endl;
+                }
+            }
     }
 
-    // for (auto child : children)
-    // {
-    //     cout << child.id << endl;
-    // }
-
-    // for (i = adj_list[startNode].begin()->first; i != adj_list[startNode].end()->first; ++i)
-
-    // for (i = adj[v].begin(); i != adj[v].end(); ++i)
-    // for (i = adj_list[startNode].begin(); i != adj_list[startNode].end(); ++i)
-    //     if (!visitedNodes[*i])
-    //         fillOrder(*i, visitedNodes, nodeStack);
-
-    // // All vertices reachable from v are processed by now, push v
-    // nodeStack.push(v);
+    cout << "Pushing " << startNode << " to stack" << endl;
+    nodeStack.push(startNode);
+    cout << endl;
+    cout << endl;
 }
 
 #endif

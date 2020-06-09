@@ -45,18 +45,50 @@ vector<vertex<T>> shortest_path(directed_graph<T> &graph, int &u_id, int &v_id)
 template <typename T>
 vector<vector<vertex<T>>> strongly_connected_components(directed_graph<T> &graph)
 {
+    // Create the main stack for SCC
     stack<int> Stack;
     int V = graph.get_vertices().size();
+    vector<vertex<T>> verticesInGraph = graph.get_vertices();
+
+    for (int i = 0; i < V; i++)
+    {
+        cout << "i: " << i << ":" << verticesInGraph[i].id << endl;
+    }
+    cout << endl;
+    cout << endl;
 
     // Mark all the vertices as not visited (For first DFS)
     bool *visited = new bool[V];
     for (int i = 0; i < V; i++)
+    {
         visited[i] = false;
+    }
 
     // Fill vertices in stack according to their finishing times
     for (int i = 0; i < V; i++)
+    {
         if (visited[i] == false)
+        {
+            cout << "Visiting: " << i << endl;
             graph.fillOrder(i, visited, Stack);
+        }
+    }
+
+    // cout << "The stack is " << Stack.size() << " elements long" << endl;
+    cout << endl;
+    cout << "=========== PRINT STACK ===========" << endl;
+    int stackSize = Stack.size();
+
+    for (int i = 0; i < stackSize; i++)
+    {
+        cout << "The stack is " << Stack.size() << " elements long before pop" << endl;
+        cout << "i: " << i << endl;
+        int topOfStack = Stack.top();
+        cout << "Stack top " << verticesInGraph[topOfStack].id << endl;
+        cout << "pop that off" << endl;
+        Stack.pop();
+        cout << "The stack is " << Stack.size() << " elements long after pop" << endl;
+    }
 
     // // Create a reversed graph
     // Graph gr = getTranspose();
