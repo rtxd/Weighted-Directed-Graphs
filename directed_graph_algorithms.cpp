@@ -47,6 +47,7 @@ vector<vector<vertex<T>>> strongly_connected_components(directed_graph<T> &graph
 {
     // Create the main stack for SCC
     stack<int> Stack;
+    stack<int> nodeStack;
     int V = graph.get_vertices().size();
     vector<vertex<T>> verticesInGraph = graph.get_vertices();
 
@@ -69,7 +70,7 @@ vector<vector<vertex<T>>> strongly_connected_components(directed_graph<T> &graph
     {
         if (visited[i] == false)
         {
-            cout << "Visiting: " << i << endl;
+            // cout << "Visiting: " << i << endl;
             graph.fillOrder(i, visited, Stack);
         }
     }
@@ -78,9 +79,45 @@ vector<vector<vertex<T>>> strongly_connected_components(directed_graph<T> &graph
 
     for (int i = 0; i < V; i++)
     {
+        cout << "i: " << i << ":" << gt.get_vertices()[i].id << endl;
+    }
+
+    for (int i = 0; i < V; i++)
+    {
         visited[i] = false;
     }
 
+    gt.display_tree();
+
+    //Create Map
+    vector<int> nodeVertexMap;
+    for (int i = 0; i < V; i++)
+    {
+        nodeVertexMap[i] = gt.get_vertices()[i].id;
+        cout << "i: " << i << "    value: " << gt.get_vertices()[i].id << endl;
+    }
+
+    //go through valueStack and create a new tempNodeStack
+    stack<int> tempNodeStack;
+    for (int i = 0; i < V; i++)
+    { //array find value StackTop
+        int stackTop = Stack.top();
+
+        auto iterator = find(nodeVertexMap.begin(), nodeVertexMap.end(), stackTop);
+        //tempNodeStack.push(iterator);
+        //cout << "tempNodeStack(push): " << tempNodeStack.top() << endl;
+        cout << "tempNodeStack(push): " << iterator - nodeVertexMap.begin() << endl;
+
+        // Basically we need to iterate over all the elements of vector and check if given elements exists or not.
+        // This can be done in a single line using std::find i.e.
+        // Eg. Check if element 22 exists in vector
+
+        //std::vector<int>::iterator it = std::find(vecOfNums.begin(), vecOfNums.end(), 22);
+
+        //vector<int>::iterator it = find(nodeVertexMap.begin(), nodeVertexMap.end(), stackTop);
+    }
+
+    //   -----------------------------
     while (!Stack.empty())
     {
         int node = Stack.top();
@@ -89,46 +126,10 @@ vector<vector<vertex<T>>> strongly_connected_components(directed_graph<T> &graph
         if (!visited[node])
         {
             gt.DFSUtil(node, visited);
+            cout << endl;
         }
     }
 
-    // cout << "The stack is " << Stack.size() << " elements long" << endl;
-    // cout << endl;
-    // cout << "=========== PRINT STACK ===========" << endl;
-    // int stackSize = Stack.size();
-
-    // for (int i = 0; i < stackSize; i++)
-    // {
-    //     cout << "The stack is " << Stack.size() << " elements long before pop" << endl;
-    //     cout << "i: " << i << endl;
-    //     int topOfStack = Stack.top();
-    //     cout << "Stack top " << verticesInGraph[topOfStack].id << endl;
-    //     cout << "pop that off" << endl;
-    //     Stack.pop();
-    //     cout << "The stack is " << Stack.size() << " elements long after pop" << endl;
-    // }
-
-    // // Create a reversed graph
-    // Graph gr = getTranspose();
-
-    // // Mark all the vertices as not visited (For second DFS)
-    // for (int i = 0; i < V; i++)
-    //     visited[i] = false;
-
-    // // Now process all vertices in order defined by Stack
-    // while (Stack.empty() == false)
-    // {
-    //     // Pop a vertex from stack
-    //     int v = Stack.top();
-    //     Stack.pop();
-
-    //     // Print Strongly connected component of the popped vertex
-    //     if (visited[v] == false)
-    //     {
-    //         gr.DFSUtil(v, visited);
-    //         cout << endl;
-    //     }
-    // }
     return vector<vector<vertex<T>>>();
 }
 

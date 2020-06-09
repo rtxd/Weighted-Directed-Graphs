@@ -262,6 +262,9 @@ int main()
     dgSCC.display_tree();
 
     strongly_connected_components(dgSCC);
+    cout << endl;
+    cout << endl;
+    cout << endl;
     system("pause");
     return 0;
 }
