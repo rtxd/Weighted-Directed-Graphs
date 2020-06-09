@@ -247,8 +247,8 @@ int main()
 
     dgSCC.add_edge(1, 2, 1);
     dgSCC.add_edge(2, 3, 1);
-    dgSCC.add_edge(3, 1, 1);
     dgSCC.add_edge(2, 4, 1);
+    dgSCC.add_edge(3, 1, 1);
     dgSCC.add_edge(4, 5, 1);
     dgSCC.add_edge(5, 6, 1);
     dgSCC.add_edge(6, 4, 1);
@@ -258,6 +258,8 @@ int main()
     dgSCC.add_edge(9, 10, 1);
     dgSCC.add_edge(10, 7, 1);
     dgSCC.add_edge(10, 11, 1);
+
+    dgSCC.display_tree();
 
     strongly_connected_components(dgSCC);
     system("pause");

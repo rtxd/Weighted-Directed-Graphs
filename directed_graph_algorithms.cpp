@@ -74,21 +74,39 @@ vector<vector<vertex<T>>> strongly_connected_components(directed_graph<T> &graph
         }
     }
 
-    // cout << "The stack is " << Stack.size() << " elements long" << endl;
-    cout << endl;
-    cout << "=========== PRINT STACK ===========" << endl;
-    int stackSize = Stack.size();
+    directed_graph<T> gt = graph.getTransposeGraph();
 
-    for (int i = 0; i < stackSize; i++)
+    for (int i = 0; i < V; i++)
     {
-        cout << "The stack is " << Stack.size() << " elements long before pop" << endl;
-        cout << "i: " << i << endl;
-        int topOfStack = Stack.top();
-        cout << "Stack top " << verticesInGraph[topOfStack].id << endl;
-        cout << "pop that off" << endl;
-        Stack.pop();
-        cout << "The stack is " << Stack.size() << " elements long after pop" << endl;
+        visited[i] = false;
     }
+
+    while (!Stack.empty())
+    {
+        int node = Stack.top();
+        Stack.pop();
+
+        if (!visited[node])
+        {
+            gt.DFSUtil(node, visited);
+        }
+    }
+
+    // cout << "The stack is " << Stack.size() << " elements long" << endl;
+    // cout << endl;
+    // cout << "=========== PRINT STACK ===========" << endl;
+    // int stackSize = Stack.size();
+
+    // for (int i = 0; i < stackSize; i++)
+    // {
+    //     cout << "The stack is " << Stack.size() << " elements long before pop" << endl;
+    //     cout << "i: " << i << endl;
+    //     int topOfStack = Stack.top();
+    //     cout << "Stack top " << verticesInGraph[topOfStack].id << endl;
+    //     cout << "pop that off" << endl;
+    //     Stack.pop();
+    //     cout << "The stack is " << Stack.size() << " elements long after pop" << endl;
+    // }
 
     // // Create a reversed graph
     // Graph gr = getTranspose();

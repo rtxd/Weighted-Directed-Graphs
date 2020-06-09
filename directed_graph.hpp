@@ -78,6 +78,7 @@ public:
 
     vector<vertex<T>> significance_sorting(); // Return a vector containing a sorted list of the vertices in descending order of their significance.
     void fillOrder(int &, bool[], stack<int> &);
+    void DFSUtil(int &, bool[]);
 };
 
 template <typename T>
@@ -861,8 +862,14 @@ void directed_graph<T>::fillOrder(int &startNode, bool visitedNodes[], stack<int
 
     cout << "set visted to true" << endl;
 
-    vector<vertex<T>> children = get_neighbours(startNode);
+    vector<vertex<T>> children = get_neighbours(verticesInGraph[startNode].id);
     cout << "has " << children.size() << " amount of children" << endl;
+
+    cout << "Print all children: " << endl;
+    for (int i = 0; i < children.size(); i++)
+    {
+        cout << children[i].id << endl;
+    }
 
     for (int i = 0; i < children.size(); i++)
     {
@@ -870,10 +877,11 @@ void directed_graph<T>::fillOrder(int &startNode, bool visitedNodes[], stack<int
         for (int j = 0; j < V; j++)
             if (children[i].id == verticesInGraph[j].id)
             {
-                cout << "j: " << j << endl;
+
                 if (!visitedNodes[j])
                 {
                     cout << "true" << endl;
+                    cout << "visiting: " << j << endl;
                     fillOrder(j, visitedNodes, nodeStack);
                 }
                 else
@@ -887,6 +895,32 @@ void directed_graph<T>::fillOrder(int &startNode, bool visitedNodes[], stack<int
     nodeStack.push(startNode);
     cout << endl;
     cout << endl;
+}
+
+template <typename T>
+void directed_graph<T>::DFSUtil(int &startNode, bool visitedNodes[])
+{
+    int V = get_vertices().size();
+    vector<vertex<T>> verticesInGraph = get_vertices();
+    // Mark current node as visited
+    visitedNodes[startNode] = true;
+    cout << verticesInGraph[startNode].id << " ";
+
+    vector<vertex<T>> children = get_neighbours(verticesInGraph[startNode].id);
+
+    for (int i = 0; i < children.size(); i++)
+    {
+        for (int j = 0; j < V; j++)
+            if (children[i].id == verticesInGraph[j].id)
+            {
+
+                if (!visitedNodes[j])
+                {
+                    DFSUtil(j, visitedNodes);
+                    cout << endl;
+                }
+            }
+    }
 }
 
 #endif
