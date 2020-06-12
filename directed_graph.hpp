@@ -79,6 +79,7 @@ public:
     vector<vertex<T>> significance_sorting(); // Return a vector containing a sorted list of the vertices in descending order of their significance.
     void fillOrder(int &, bool[], stack<int> &);
     void DFSUtil(int &, bool[]);
+    void dfs(int &, bool[], vector<int> &, vector<int>);
 };
 
 template <typename T>
@@ -852,103 +853,76 @@ void directed_graph<T>::fillOrder(int &startNode, bool visitedNodes[], stack<int
     // Mark the current node as visited and print it
     int V = get_vertices().size();
     vector<vertex<T>> verticesInGraph = get_vertices();
-    // for (int i = 0; i < V; i++)
-    // {
-    //     cout << visitedNodes[i] << endl;
-    // }
 
-    //Set this visted = true
     visitedNodes[startNode] = true;
 
-    // cout << "set visted to true" << endl;
-
     vector<vertex<T>> children = get_neighbours(verticesInGraph[startNode].id);
-    // cout << "has " << children.size() << " amount of children" << endl;
-
-    // cout << "Print all children: " << endl;
-    // for (int i = 0; i < children.size(); i++)
-    // {
-    //     cout << children[i].id << endl;
-    // }
 
     for (int i = 0; i < children.size(); i++)
     {
-        // cout << "has unvisited child? ";
         for (int j = 0; j < V; j++)
             if (children[i].id == verticesInGraph[j].id)
             {
 
                 if (!visitedNodes[j])
                 {
-                    // cout << "true" << endl;
-                    // cout << "visiting: " << j << endl;
                     fillOrder(j, visitedNodes, nodeStack);
                 }
-                // else
-                // {
-                //     cout << "false" << endl;
-                // }
             }
     }
 
     cout << "Pushing " << verticesInGraph[startNode].id << " to stack" << endl;
     nodeStack.push(verticesInGraph[startNode].id);
-    // cout << endl;
-    // cout << endl;
 }
 
 template <typename T>
 void directed_graph<T>::DFSUtil(int &startNode, bool visitedNodes[])
 {
-    // cout << "DFSUtil (startNode= n" << startNode << ", visitedNodes)" << endl;
     int V = get_vertices().size();
-    // cout << "   #Vertices:" << V << endl;
 
     vector<vertex<T>> verticesInGraph = get_vertices();
 
-    // cout << "    visitedNodes:   " << endl;
-    // for (int i = 0; i < V; i++)
-    // {
-    // cout << "                n" << visitedNodes[i] << endl;
-    // }
-
     // Mark current node as visited
     visitedNodes[startNode] = true;
-    // cout << "set visted to true" << endl;
+
+    // Add node to list
     cout << "v" << verticesInGraph[startNode].id << ", ";
-    // cout << "Print out node" << endl;
 
     vector<vertex<T>> children = get_neighbours(verticesInGraph[startNode].id);
-    // cout << "has " << children.size() << " amount of children" << endl;
-
-    // cout << "Print all children: " << endl;
-    // for (int i = 0; i < children.size(); i++)
-    // {
-    //     cout << "v" << children[i].id << endl;
-    // }
 
     for (int i = 0; i < children.size(); i++)
     {
-        // cout << "has unvisited child? ";
         for (int j = 0; j < V; j++)
         {
             if (children[i].id == verticesInGraph[j].id)
             {
-                // cout << "nj: " << j << endl;
-                // cout << "Child id == verticesInGraph.id    : " << children[i].id << " == " << verticesInGraph[j].id << endl;
                 if (!visitedNodes[j])
                 {
-                    // cout << "true" << endl;
-                    // cout << "visiting: n" << j << endl;
                     DFSUtil(j, visitedNodes);
                 }
-                // else
-                // {
-                //     cout << "false" << endl;
-                // }
             }
         }
     }
+}
+
+template <typename T>
+void directed_graph<T>::dfs(int &currentNode, bool visited[], vector<int> &visitedNodes, vector<int> nodeVertexMap)
+{
+    visited[currentNode] = true;
+    vector<vertex<T>> edges = get_neighbours(get_vertices()[currentNode].id);
+
+    for (auto edge : edges)
+    {
+        // Converting edge vertex from value to node (aka index)
+        vector<int>::iterator it = find(nodeVertexMap.begin(), nodeVertexMap.end(), edge.id);
+        int edgeNode = distance(nodeVertexMap.begin(), it);
+        if (visited[edgeNode] == false)
+        {
+            dfs(edgeNode, visited, visitedNodes, nodeVertexMap);
+        }
+    }
+
+    visitedNodes.push_back(currentNode);
 }
 
 #endif

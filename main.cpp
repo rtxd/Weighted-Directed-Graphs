@@ -231,37 +231,68 @@ int main()
 
     // cout << "reachable: " << directedGraph2.reachable(1, 1) << endl;
 
-    directed_graph<double> dgSCC;
+    // directed_graph<double> dgSCC;
 
-    dgSCC.add_vertex(vertex<double>(1, 1));
-    dgSCC.add_vertex(vertex<double>(2, 1));
-    dgSCC.add_vertex(vertex<double>(3, 1));
-    dgSCC.add_vertex(vertex<double>(4, 1));
-    dgSCC.add_vertex(vertex<double>(5, 1));
-    dgSCC.add_vertex(vertex<double>(6, 1));
-    dgSCC.add_vertex(vertex<double>(7, 1));
-    dgSCC.add_vertex(vertex<double>(8, 1));
-    dgSCC.add_vertex(vertex<double>(9, 1));
-    dgSCC.add_vertex(vertex<double>(10, 1));
-    dgSCC.add_vertex(vertex<double>(11, 1));
+    // dgSCC.add_vertex(vertex<double>(1, 1));
+    // dgSCC.add_vertex(vertex<double>(2, 1));
+    // dgSCC.add_vertex(vertex<double>(3, 1));
+    // dgSCC.add_vertex(vertex<double>(4, 1));
+    // dgSCC.add_vertex(vertex<double>(5, 1));
+    // dgSCC.add_vertex(vertex<double>(6, 1));
+    // dgSCC.add_vertex(vertex<double>(7, 1));
+    // dgSCC.add_vertex(vertex<double>(8, 1));
+    // dgSCC.add_vertex(vertex<double>(9, 1));
+    // dgSCC.add_vertex(vertex<double>(10, 1));
+    // dgSCC.add_vertex(vertex<double>(11, 1));
 
-    dgSCC.add_edge(1, 2, 1);
-    dgSCC.add_edge(2, 3, 1);
-    dgSCC.add_edge(2, 4, 1);
-    dgSCC.add_edge(3, 1, 1);
-    dgSCC.add_edge(4, 5, 1);
-    dgSCC.add_edge(5, 6, 1);
-    dgSCC.add_edge(6, 4, 1);
-    dgSCC.add_edge(7, 6, 1);
-    dgSCC.add_edge(7, 8, 1);
-    dgSCC.add_edge(8, 9, 1);
-    dgSCC.add_edge(9, 10, 1);
-    dgSCC.add_edge(10, 7, 1);
-    dgSCC.add_edge(10, 11, 1);
+    // dgSCC.add_edge(1, 2, 1);
+    // dgSCC.add_edge(2, 3, 1);
+    // dgSCC.add_edge(2, 4, 1);
+    // dgSCC.add_edge(3, 1, 1);
+    // dgSCC.add_edge(4, 5, 1);
+    // dgSCC.add_edge(5, 6, 1);
+    // dgSCC.add_edge(6, 4, 1);
+    // dgSCC.add_edge(7, 6, 1);
+    // dgSCC.add_edge(7, 8, 1);
+    // dgSCC.add_edge(8, 9, 1);
+    // dgSCC.add_edge(9, 10, 1);
+    // dgSCC.add_edge(10, 7, 1);
+    // dgSCC.add_edge(10, 11, 1);
 
-    dgSCC.display_tree();
+    // dgSCC.display_tree();
 
-    strongly_connected_components(dgSCC);
+    // strongly_connected_components(dgSCC);
+
+    directed_graph<double> dgTopSort;
+
+    dgTopSort.add_vertex(vertex<double>(1, 1));
+    dgTopSort.add_vertex(vertex<double>(2, 1));
+    dgTopSort.add_vertex(vertex<double>(3, 1));
+    dgTopSort.add_vertex(vertex<double>(4, 1));
+    dgTopSort.add_vertex(vertex<double>(5, 1));
+    dgTopSort.add_vertex(vertex<double>(6, 1));
+    dgTopSort.add_vertex(vertex<double>(7, 1));
+    dgTopSort.add_vertex(vertex<double>(8, 1));
+    dgTopSort.add_vertex(vertex<double>(9, 1));
+
+    dgTopSort.add_edge(1, 4, 1);
+    dgTopSort.add_edge(2, 4, 1);
+    dgTopSort.add_edge(3, 2, 1);
+    dgTopSort.add_edge(3, 1, 1);
+    dgTopSort.add_edge(4, 7, 1);
+    dgTopSort.add_edge(4, 8, 1);
+    dgTopSort.add_edge(5, 1, 1);
+    dgTopSort.add_edge(5, 6, 1);
+    dgTopSort.add_edge(7, 9, 1);
+    dgTopSort.add_edge(8, 9, 1);
+
+    dgTopSort.display_tree();
+
+    for (auto node : topological_sort(dgTopSort))
+    {
+        cout << node.id;
+    }
+
     cout << endl;
     cout << endl;
     cout << endl;

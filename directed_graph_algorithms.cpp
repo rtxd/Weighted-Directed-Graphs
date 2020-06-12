@@ -157,8 +157,58 @@ vector<vector<vertex<T>>> strongly_connected_components(directed_graph<T> &graph
 template <typename T>
 vector<vertex<T>> topological_sort(directed_graph<T> &graph)
 {
+    // Result we will return at the end
+    vector<vertex<T>> result;
+    // Number of vertices in graph
+    int N = graph.get_vertices().size();
+    // Array of visited
+    bool *visited = new bool[N];
+    for (int i = 0; i < N; i++)
+    {
+        visited[i] = false;
+    }
 
-    return vector<vertex<T>>();
+    //Create a node vertex map, this map allows us to get the INDEX of a vertex and reference that indexs VALUE and vice versa
+    vector<int> nodeVertexMap;
+    // Add all vertice IDs to the nodeVertexMap
+    for (int i = 0; i < N; i++)
+    {
+        nodeVertexMap.push_back(graph.get_vertices()[i].id);
+    }
+
+    // Create an array called ordering, this will store the order of the nodes using their indexs
+    int ordering[N];
+    // Since topological sort finds the last value first, we will need to start our index from the back of the array
+    int i = N - 1;
+
+    // For each node in the graph
+    for (int currentNode = 0; currentNode < N; currentNode++)
+    {
+        // If we have not visited the currentNode then do below
+        if (visited[currentNode] == false)
+        {
+            vector<int> visitedNodes;
+            // Run recursive DFS
+            // Here we have to pass in the node we are currently visiting, the visited array so we know which nodes have been visited,
+            // the visitedNodes vector which will ultimately contain the result this dfs (an output of nodes in topological order),
+            // and finally the nodeVertexMap so we can see what node index has which node value
+            graph.dfs(currentNode, visited, visitedNodes, nodeVertexMap);
+            // Loop through the visitedNodes and store them in the ordering array in the correct order
+            for (auto nodeId : visitedNodes)
+            {
+                ordering[i] = nodeId;
+                i = i - 1;
+            }
+        }
+    }
+
+    // Put the ordered nodes into the returned format (a vector of vertex's aka vector<vertex<T>>)
+    for (int i = 0; i < N; i++)
+    {
+        result.push_back(graph.get_vertex(nodeVertexMap[ordering[i]]));
+    }
+
+    return result;
 }
 
 /*
