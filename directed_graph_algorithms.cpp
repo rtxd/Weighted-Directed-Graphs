@@ -31,6 +31,86 @@ using namespace std;
 template <typename T>
 vector<vertex<T>> shortest_path(directed_graph<T> &graph, int &u_id, int &v_id)
 {
+    vector<int> nodeVertexMap;
+    int V = graph.get_vertices().size();
+    // Create Distance array and set all distances to positive infinity, and 0 for u_id
+    int dist[V];
+    // Create visited array and mark all as unvisited
+    bool *visited = new bool[V];
+    for (int i = 0; i < V; i++)
+    {
+        visited[i] = false;
+        dist[i] = 9999; //Infinity
+        cout << "pushing this into node vertex map: " << graph.get_vertices()[i].id << endl;
+        nodeVertexMap.push_back(graph.get_vertices()[i].id);
+    }
+    vector<int>::iterator it = find(nodeVertexMap.begin(), nodeVertexMap.end(), u_id);
+    // Set the current vertext to u
+    int currentNode = distance(nodeVertexMap.begin(), it);
+    // Set the start node distance to value of 0
+    dist[currentNode] = 0;
+
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
+    pq.push(pair<int, int>(currentNode, 0));
+
+    // ----- CHECKING EVERTYHING
+    for (int i = 0; i < V; i++)
+    {
+        cout << "For i = " << i << endl;
+        cout << "   Visited: " << visited[i] << endl;
+        cout << "   Dist: " << dist[i] << endl;
+        cout << "   Node Vertex Map: " << nodeVertexMap[i] << endl;
+    }
+    cout << "int currentNode = " << currentNode << endl;
+
+    // While there are unvisited vertices
+    while (!pq.empty())
+    {
+        cout << "While loop start" << endl;
+
+        int index = pq.top().first;
+        pq.pop();
+
+        cout << "Index = " << index << endl;
+
+        visited[index] = true;
+
+        
+
+        for (auto sourceNode : graph.get_adj_list())
+        {
+            for (auto destNode : sourceNode.second)
+            {
+
+                int destNodeID = graph.get_node(destNode.first, nodeVertexMap);
+                if (!visited[destNodeID])
+                {
+                    int newDist = dist[index] + graph.get_edge_weight(sourceNode.first, destNode.first);
+                    if (newDist < dist[destNodeID])
+                    {
+                        dist[destNodeID] = newDist;
+                        pq.push(pair<int, int>(destNodeID, newDist));
+                        cout << "destNodeID: " << destNodeID << "   newDist: " << newDist << endl;
+                    }
+                }
+            }
+        }
+    }
+
+    cout << "do stuff" << endl;
+    for (int i = 0; i < sizeof(dist); i++)
+    {
+        cout << dist[i] << endl;
+    }
+    // For each unvisited neighbour of the current vertex
+    // Compare the distance of each neighbour to the distance to current plus the edge weight
+    // of the edge joinging them
+
+    // Keep whichever is smaller
+
+    // Mark the current vertex as visited
+
+    // Select the unvisted vertext with the smallest tentative distance and set it as the current vertex
 
     return vector<vertex<T>>();
 }

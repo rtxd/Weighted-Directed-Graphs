@@ -263,35 +263,57 @@ int main()
 
     // strongly_connected_components(dgSCC);
 
-    directed_graph<double> dgTopSort;
+    // directed_graph<double> dgTopSort;
 
-    dgTopSort.add_vertex(vertex<double>(1, 1));
-    dgTopSort.add_vertex(vertex<double>(2, 1));
-    dgTopSort.add_vertex(vertex<double>(3, 1));
-    dgTopSort.add_vertex(vertex<double>(4, 1));
-    dgTopSort.add_vertex(vertex<double>(5, 1));
-    dgTopSort.add_vertex(vertex<double>(6, 1));
-    dgTopSort.add_vertex(vertex<double>(7, 1));
-    dgTopSort.add_vertex(vertex<double>(8, 1));
-    dgTopSort.add_vertex(vertex<double>(9, 1));
+    // dgTopSort.add_vertex(vertex<double>(1, 1));
+    // dgTopSort.add_vertex(vertex<double>(2, 1));
+    // dgTopSort.add_vertex(vertex<double>(3, 1));
+    // dgTopSort.add_vertex(vertex<double>(4, 1));
+    // dgTopSort.add_vertex(vertex<double>(5, 1));
+    // dgTopSort.add_vertex(vertex<double>(6, 1));
+    // dgTopSort.add_vertex(vertex<double>(7, 1));
+    // dgTopSort.add_vertex(vertex<double>(8, 1));
+    // dgTopSort.add_vertex(vertex<double>(9, 1));
 
-    dgTopSort.add_edge(1, 4, 1);
-    dgTopSort.add_edge(2, 4, 1);
-    dgTopSort.add_edge(3, 2, 1);
-    dgTopSort.add_edge(3, 1, 1);
-    dgTopSort.add_edge(4, 7, 1);
-    dgTopSort.add_edge(4, 8, 1);
-    dgTopSort.add_edge(5, 1, 1);
-    dgTopSort.add_edge(5, 6, 1);
-    dgTopSort.add_edge(7, 9, 1);
-    dgTopSort.add_edge(8, 9, 1);
+    // dgTopSort.add_edge(1, 4, 4);
+    // dgTopSort.add_edge(2, 4, 7);
+    // dgTopSort.add_edge(3, 2, 3);
+    // dgTopSort.add_edge(3, 1, 9);
+    // dgTopSort.add_edge(4, 7, 5);
+    // dgTopSort.add_edge(4, 8, 5);
+    // dgTopSort.add_edge(5, 1, 8);
+    // dgTopSort.add_edge(5, 6, 4);
+    // dgTopSort.add_edge(7, 9, 77);
+    // dgTopSort.add_edge(8, 9, 6);
 
-    dgTopSort.display_tree();
+    // dgTopSort.display_tree();
 
-    for (auto node : topological_sort(dgTopSort))
-    {
-        cout << node.id;
-    }
+    // for (auto node : topological_sort(dgTopSort))
+    // {
+    //     cout << node.id;
+    // }
+
+    directed_graph<double> dgSPA;
+
+    vertex<double> v1 = vertex<double>(0, 1);
+    vertex<double> v5 = vertex<double>(4, 1);
+
+    dgSPA.add_vertex(vertex<double>(0, 1));
+    dgSPA.add_vertex(vertex<double>(1, 1));
+    dgSPA.add_vertex(vertex<double>(2, 1));
+    dgSPA.add_vertex(vertex<double>(3, 1));
+    dgSPA.add_vertex(vertex<double>(4, 1));
+
+    dgSPA.add_edge(0, 2, 1);
+    dgSPA.add_edge(0, 1, 4);
+    dgSPA.add_edge(1, 3, 1);
+    dgSPA.add_edge(2, 1, 2);
+    dgSPA.add_edge(2, 3, 5);
+    dgSPA.add_edge(3, 4, 3);
+
+    int startNode = 0;
+    int endNode = 4;
+    shortest_path(dgSPA, startNode, endNode);
 
     cout << endl;
     cout << endl;

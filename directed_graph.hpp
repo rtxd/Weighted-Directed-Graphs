@@ -80,6 +80,10 @@ public:
     void fillOrder(int &, bool[], stack<int> &);
     void DFSUtil(int &, bool[]);
     void dfs(int &, bool[], vector<int> &, vector<int>);
+    T get_edge_weight(T, T);
+    int get_node(const int &, vector<int>);
+
+    unordered_map<int, unordered_map<int, T>> get_adj_list();
 };
 
 template <typename T>
@@ -925,4 +929,37 @@ void directed_graph<T>::dfs(int &currentNode, bool visited[], vector<int> &visit
     visitedNodes.push_back(currentNode);
 }
 
+template <typename T>
+T directed_graph<T>::get_edge_weight(T u, T v)
+{
+    for (auto vertex : adj_list)
+    {
+        if (vertex.first == u)
+        {
+            for (auto neighbour : vertex.second)
+            {
+                if (neighbour.first == v)
+                {
+                    return neighbour.second;
+                }
+            }
+        }
+    }
+
+    return -1;
+}
+
+template <typename T>
+unordered_map<int, unordered_map<int, T>> directed_graph<T>::get_adj_list()
+{
+    return adj_list;
+}
+
+template <typename T>
+int directed_graph<T>::get_node(const int &u_id, vector<int> nodeVertexMap)
+{
+    vector<int>::iterator it = find(nodeVertexMap.begin(), nodeVertexMap.end(), u_id);
+
+    return distance(nodeVertexMap.begin(), it);
+}
 #endif
