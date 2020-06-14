@@ -29,99 +29,94 @@ using namespace std;
  * which has the smallest total weight of edges among all possible paths from u to v.
  */
 template <typename T>
-vector<vertex<T>> shortest_path(directed_graph<T> &graph, int &u_id, int &v_id)
+vector<vertex<T>> shortest_path(directed_graph<T> graph, int u_id, int v_id)
 {
-    int INFINITY = 999999;
+    //Create result vector
     vector<vertex<T>> result;
+    // Declare infinity
+    const int infinity = 999999;
+    // Create node vertex map, this will be used to easily map between the index of
+    // a node and it's value
     vector<int> nodeVertexMap;
     int V = graph.get_vertices().size();
-    // Create Distance array and set all distances to positive infinity, and 0 for u_id
+    // Create Distance array and set all distances to positive infinity,
+    // and 0 for u_id
     int dist[V];
-    int prevNode[V];
-    // Create visited array and mark all as unvisited
+    // Prev node will allow us to trace back our steps at the end so we can get
+    // the node path
+    int PreviousNode[V];
+    // Create visited array
     bool *visited = new bool[V];
+    // Loop through all vertex's and set values for arrays
     for (int i = 0; i < V; i++)
     {
         visited[i] = false;
-        dist[i] = INFINITY; //Infinity
-        prevNode[i] = -1;
-        cout << "pushing this into node vertex map: " << graph.get_vertices()[i].id << endl;
+        dist[i] = infinity; //Infinity
+        PreviousNode[i] = -1;
         nodeVertexMap.push_back(graph.get_vertices()[i].id);
     }
-    vector<int>::iterator it = find(nodeVertexMap.begin(), nodeVertexMap.end(), u_id);
+
     // Set the current vertext to u
-    int currentNode = distance(nodeVertexMap.begin(), it);
+    int currentNode = graph.get_node(u_id, nodeVertexMap);
     // Set the start node distance to value of 0
     dist[currentNode] = 0;
 
+    // Create two priority queues, one queue to keep track of the node and
+    // another queue to keep track of the distance to that node
     priority_queue<int, vector<int>, greater<int>> pqNode;
     priority_queue<int, vector<int>, greater<int>> pqDist;
+    // Push currentNode(starting node) and distance (0) into queue
     pqNode.push(currentNode);
     pqDist.push(0);
 
-    // ----- CHECKING EVERTYHING
-    for (int i = 0; i < V; i++)
-    {
-        cout << "For i = " << i << endl;
-        cout << "   Visited: " << visited[i] << endl;
-        cout << "   Dist: " << dist[i] << endl;
-        cout << "   Node Vertex Map: " << nodeVertexMap[i] << endl;
-    }
-    cout << "int currentNode = " << currentNode << endl;
-
-    // While there are unvisited vertices
+    // While the queue isn't empty
     while (!pqNode.empty())
     {
-        cout << "While loop start" << endl;
-
+        // Set the current index to the minimum value in the queue
         int index = pqNode.top();
+        // Pop the min value off the queue
         pqNode.pop();
         pqDist.pop();
-
-        cout << "Index = " << index << endl;
-
+        // Mark current node as visited
         visited[index] = true;
 
-        // if (pqDist.top() > dist[index])
+        // for each neighbour of this node
         for (auto neighbour : graph.get_neighbours(nodeVertexMap[index]))
         {
-
-            cout << "Neigbour value =  " << neighbour.id << endl;
+            // Get the index of the Neighbour node using our mapping vector
             int neighbourNode = graph.get_node(neighbour.id, nodeVertexMap);
 
-            // if (!visited[neighbourNode])
-            // {
+            // Set the new distance = to the old distance plus the
+            // edgeweight we just travelled
             int newDist = dist[index] + graph.get_edge_weight(nodeVertexMap[index], neighbour.id);
             if (newDist < dist[neighbourNode])
             {
-                prevNode[neighbourNode] = index;
+                PreviousNode[neighbourNode] = index;
                 dist[neighbourNode] = newDist;
+                // Push node and new distance into queue
                 pqNode.push(neighbourNode);
                 pqDist.push(newDist);
-
-                cout << "Neighbour Node: " << neighbourNode << "   newDist: " << newDist << endl;
             }
-            // }
         }
     }
-    // b4 going further lets see what we got for prevNode
 
-    // From this point we are going to work out path
-
+    // From this point we are going to work out the path we took
     vector<int> path;
 
     // Now we need to find the shortest path dist to v_id (vertex value) ... look this up in neighbourNode (use getNode)
-    // We are doing this so that if it's 9999 we can stop now as there is no path
-
     int FinalNode = graph.get_node(v_id, nodeVertexMap);
-    if (dist[FinalNode] == INFINITY)
+    // We are doing this so that if it's infinity we can stop now as there is no path
+    if (dist[FinalNode] == infinity)
         return vector<vertex<T>>();
-    for (int at = FinalNode; at != -1; at = prevNode[at])
+
+    // Loop to get the nodes from back to front
+    for (int at = FinalNode; at != -1; at = PreviousNode[at])
     {
-        cout << "at: " << at << endl;
+        // Add each node to the vector
         result.push_back(graph.get_vertex(nodeVertexMap[at]));
     }
 
+    // Reverse it as it'll be in the wrong order
     reverse(result.begin(), result.end());
 
     return result;
@@ -135,20 +130,18 @@ vector<vertex<T>> shortest_path(directed_graph<T> &graph, int &u_id, int &v_id)
  */
 
 template <typename T>
-vector<vector<vertex<T>>> strongly_connected_components(directed_graph<T> &graph)
+vector<vector<vertex<T>>> strongly_connected_components(directed_graph<T> graph)
 {
-    // Create the main stack for SCC
-    stack<int> Stack;
+    vector<vector<vertex<T>>> result;
+    // Create the main stack for SCC, this stack will be used to create the order
+    // in which we will recursively run dfs on each node.
+    // Hence this stack is aka the fillOrderStack
+    stack<int> fillOrderStack;
+    // The stack
     stack<int> nodeStack;
+    // Let V = amount of nodes in graph
     int V = graph.get_vertices().size();
     vector<vertex<T>> verticesInGraph = graph.get_vertices();
-
-    for (int i = 0; i < V; i++)
-    {
-        cout << "i: " << i << ":" << verticesInGraph[i].id << endl;
-    }
-    cout << endl;
-    cout << endl;
 
     // Mark all the vertices as not visited (For first DFS)
     bool *visited = new bool[V];
@@ -157,87 +150,71 @@ vector<vector<vertex<T>>> strongly_connected_components(directed_graph<T> &graph
         visited[i] = false;
     }
 
-    // Fill vertices in stack according to their finishing times
     for (int i = 0; i < V; i++)
     {
+        // Fill vertices in stack according to their finishing times
         if (visited[i] == false)
         {
-            // cout << "Visiting: " << i << endl;
-            graph.fillOrder(i, visited, Stack);
+            graph.fillOrder(i, visited, fillOrderStack);
         }
     }
 
-    directed_graph<T> gt = graph.getTransposeGraph();
+    // Get the transpose of the graph
+    directed_graph<T> gt = graph.get_transpose_graph();
 
     for (int i = 0; i < V; i++)
     {
-        cout << "i: " << i << ":" << gt.get_vertices()[i].id << endl;
-    }
-
-    for (int i = 0; i < V; i++)
-    {
+        // Reset all nodes to unvisited (so we can reuse this array for our dfs)
         visited[i] = false;
     }
 
-    gt.display_tree();
-
-    //Create Map
+    // Create node vertex map, same functionality as nodeVertexMap
+    // in all other functions
     vector<int> nodeVertexMap;
     for (int i = 0; i < V; i++)
     {
         nodeVertexMap.push_back(gt.get_vertices()[i].id);
-        cout << "i: " << i << "    value: " << gt.get_vertices()[i].id << endl;
     }
 
-    //go through valueStack and create a new tempNodeStack
+    // In order to get the values from fillOrderStack into another stack,
+    // in the correct order, we need to use a tempNodeStack
     stack<int> tempNodeStack;
     for (int i = 0; i < V; i++)
-    { //array find value StackTop
-        int stackTop = Stack.top();
-        cout << "stacktop" << stackTop << endl;
-
-        vector<int>::iterator it = find(nodeVertexMap.begin(), nodeVertexMap.end(), stackTop);
-        //tempNodeStack.push(iterator);
-        //cout << "tempNodeStack(push): " << tempNodeStack.top() << endl;
-        cout << "tempNodeStack(push): " << distance(nodeVertexMap.begin(), it) << endl;
-        tempNodeStack.push(distance(nodeVertexMap.begin(), it));
-
-        Stack.pop();
-        // Basically we need to iterate over all the elements of vector and check if given elements exists or not.
-        // This can be done in a single line using std::find i.e.
-        // Eg. Check if element 22 exists in vector
-
-        //std::vector<int>::iterator it = std::find(vecOfNums.begin(), vecOfNums.end(), 22);
-
-        //vector<int>::iterator it = find(nodeVertexMap.begin(), nodeVertexMap.end(), stackTop);
-    }
-
-    cout << "new" << endl;
-    // push tempNodeStack into nodeStack
-    for (int j = 0; j < V; j++)
     {
-        // cout << "hello world ;)" << endl;
-        int somerandomname = tempNodeStack.top();
-        // cout << somerandomname << endl;
-        nodeStack.push(somerandomname);
-        tempNodeStack.pop();
-        // cout << "nodeStack" << nodeStack.top() << endl;
+        int nodeId = graph.get_node(fillOrderStack.top(), nodeVertexMap);
+        tempNodeStack.push(nodeId);
+        fillOrderStack.pop();
     }
 
-    //   -----------------------------
+    for (int i = 0; i < V; i++)
+    {
+        int stackTop = tempNodeStack.top();
+        nodeStack.push(stackTop);
+        tempNodeStack.pop();
+    }
+
+    // Declare an iterator, this will be used to loop through each group of
+    // strongly connected components inside the results vector
+    int iterator = 0;
+    // While node stack is not empty
     while (!nodeStack.empty())
     {
+        // set current node equal to the top node, then pop it off stack
         int node = nodeStack.top();
         nodeStack.pop();
 
+        // If we have not visited current node then visit it
         if (!visited[node])
         {
-            gt.DFSUtil(node, visited);
-            cout << endl;
+            // Create empty vertex to modify inside dfs
+            result.push_back(vector<vertex<T>>());
+            gt.dfs_scc(node, visited, result[iterator]);
+            // Move on to next group of strongly connected components (add 1 to iterator)
+            iterator++;
         }
     }
 
-    return vector<vector<vertex<T>>>();
+    return result;
 }
 
 /*
@@ -247,7 +224,7 @@ vector<vector<vertex<T>>> strongly_connected_components(directed_graph<T> &graph
  * You will be given a DAG as the argument.
  */
 template <typename T>
-vector<vertex<T>> topological_sort(directed_graph<T> &graph)
+vector<vertex<T>> topological_sort(directed_graph<T> graph)
 {
     // Result we will return at the end
     vector<vertex<T>> result;
@@ -255,16 +232,12 @@ vector<vertex<T>> topological_sort(directed_graph<T> &graph)
     int N = graph.get_vertices().size();
     // Array of visited
     bool *visited = new bool[N];
+    //Create a node vertex map, this map allows us to get the INDEX of a vertex and reference that indexs VALUE and vice versa
+    vector<int> nodeVertexMap;
+    // Add all vertice IDs to the nodeVertexMap and set all nodes to unvisited
     for (int i = 0; i < N; i++)
     {
         visited[i] = false;
-    }
-
-    //Create a node vertex map, this map allows us to get the INDEX of a vertex and reference that indexs VALUE and vice versa
-    vector<int> nodeVertexMap;
-    // Add all vertice IDs to the nodeVertexMap
-    for (int i = 0; i < N; i++)
-    {
         nodeVertexMap.push_back(graph.get_vertices()[i].id);
     }
 
@@ -284,7 +257,7 @@ vector<vertex<T>> topological_sort(directed_graph<T> &graph)
             // Here we have to pass in the node we are currently visiting, the visited array so we know which nodes have been visited,
             // the visitedNodes vector which will ultimately contain the result this dfs (an output of nodes in topological order),
             // and finally the nodeVertexMap so we can see what node index has which node value
-            graph.dfs(currentNode, visited, visitedNodes, nodeVertexMap);
+            graph.dfs_topsort(currentNode, visited, visitedNodes, nodeVertexMap);
             // Loop through the visitedNodes and store them in the ordering array in the correct order
             for (auto nodeId : visitedNodes)
             {
@@ -309,14 +282,25 @@ vector<vertex<T>> topological_sort(directed_graph<T> &graph)
  * vertices denote cities; vertex weights denote cities' population;
  * edge weights denote the fixed delivery cost between cities, which is irrelevant to 
  * the amount of goods being delivered. 
-
-
-
- 
  */
 template <typename T>
-T low_cost_delivery(directed_graph<T> &graph, int &u_id)
+T low_cost_delivery(directed_graph<T> graph, int u_id)
 {
+    // Need to keep track of paths (i.e. pairs of vertex) that have been crossed (so we don't visit again)
+    // crossed_paths
+    // Total_Population
+    // Total Cost
+
+    // Cycle through all vertices in any order (may as well be node order)
+    // for i = 0 to V-1
+
+    //Only do anything if the vertex is not the starting vertex
+    //if i != node(u_id)
+    // work our shortest path to this vertex
+    // sp  = shortest_path(directed_graph<T> graph, int u_id, int v_id)
+    //cycle step
+
+    //
 
     return 0;
 }

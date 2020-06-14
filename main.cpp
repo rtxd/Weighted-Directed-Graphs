@@ -2,6 +2,7 @@
 #include "directed_graph_algorithms.cpp"
 #include <stdlib.h>
 #include "graph.hpp"
+#include <typeinfo>
 
 int main()
 {
@@ -231,37 +232,46 @@ int main()
 
     // cout << "reachable: " << directedGraph2.reachable(1, 1) << endl;
 
-    // directed_graph<double> dgSCC;
+    directed_graph<double> dgSCC;
 
-    // dgSCC.add_vertex(vertex<double>(1, 1));
-    // dgSCC.add_vertex(vertex<double>(2, 1));
-    // dgSCC.add_vertex(vertex<double>(3, 1));
-    // dgSCC.add_vertex(vertex<double>(4, 1));
-    // dgSCC.add_vertex(vertex<double>(5, 1));
-    // dgSCC.add_vertex(vertex<double>(6, 1));
-    // dgSCC.add_vertex(vertex<double>(7, 1));
-    // dgSCC.add_vertex(vertex<double>(8, 1));
-    // dgSCC.add_vertex(vertex<double>(9, 1));
-    // dgSCC.add_vertex(vertex<double>(10, 1));
-    // dgSCC.add_vertex(vertex<double>(11, 1));
+    dgSCC.add_vertex(vertex<double>(1, 1));
+    dgSCC.add_vertex(vertex<double>(2, 1));
+    dgSCC.add_vertex(vertex<double>(3, 1));
+    dgSCC.add_vertex(vertex<double>(4, 1));
+    dgSCC.add_vertex(vertex<double>(5, 1));
+    dgSCC.add_vertex(vertex<double>(6, 1));
+    dgSCC.add_vertex(vertex<double>(7, 1));
+    dgSCC.add_vertex(vertex<double>(8, 1));
+    dgSCC.add_vertex(vertex<double>(9, 1));
+    dgSCC.add_vertex(vertex<double>(10, 1));
+    dgSCC.add_vertex(vertex<double>(11, 1));
 
-    // dgSCC.add_edge(1, 2, 1);
-    // dgSCC.add_edge(2, 3, 1);
-    // dgSCC.add_edge(2, 4, 1);
-    // dgSCC.add_edge(3, 1, 1);
-    // dgSCC.add_edge(4, 5, 1);
-    // dgSCC.add_edge(5, 6, 1);
-    // dgSCC.add_edge(6, 4, 1);
-    // dgSCC.add_edge(7, 6, 1);
-    // dgSCC.add_edge(7, 8, 1);
-    // dgSCC.add_edge(8, 9, 1);
-    // dgSCC.add_edge(9, 10, 1);
-    // dgSCC.add_edge(10, 7, 1);
-    // dgSCC.add_edge(10, 11, 1);
+    dgSCC.add_edge(1, 2, 1);
+    dgSCC.add_edge(2, 3, 1);
+    dgSCC.add_edge(2, 4, 1);
+    dgSCC.add_edge(3, 1, 1);
+    dgSCC.add_edge(4, 5, 1);
+    dgSCC.add_edge(5, 6, 1);
+    dgSCC.add_edge(6, 4, 1);
+    dgSCC.add_edge(7, 6, 1);
+    dgSCC.add_edge(7, 8, 1);
+    dgSCC.add_edge(8, 9, 1);
+    dgSCC.add_edge(9, 10, 1);
+    dgSCC.add_edge(10, 7, 1);
+    dgSCC.add_edge(10, 11, 1);
 
-    // dgSCC.display_tree();
+    dgSCC.display_tree();
 
-    // strongly_connected_components(dgSCC);
+    vector<vector<vertex<double>>> stronglyConnectedComponents = strongly_connected_components(dgSCC);
+
+    for (auto component : stronglyConnectedComponents)
+    {
+        for (auto v : component)
+        {
+            cout << v.id << ", ";
+        }
+        cout << endl;
+    }
 
     // directed_graph<double> dgTopSort;
 
@@ -310,41 +320,41 @@ int main()
     // dgSPA.add_edge(2, 1, 2);
     // dgSPA.add_edge(2, 3, 5);
     // dgSPA.add_edge(3, 4, 3);
-    directed_graph<double> dgSPA;
+    // directed_graph<double> dgSPA;
 
-    vertex<double> v1 = vertex<double>(1, 1);
-    vertex<double> v5 = vertex<double>(8, 1);
+    // vertex<double> v1 = vertex<double>(1, 1);
+    // vertex<double> v5 = vertex<double>(8, 1);
 
-    dgSPA.add_vertex(vertex<double>(0, 1));
-    dgSPA.add_vertex(vertex<double>(1, 1));
-    dgSPA.add_vertex(vertex<double>(2, 1));
-    dgSPA.add_vertex(vertex<double>(3, 1));
-    dgSPA.add_vertex(vertex<double>(4, 1));
-    dgSPA.add_vertex(vertex<double>(5, 1));
-    dgSPA.add_vertex(vertex<double>(6, 1));
-    dgSPA.add_vertex(vertex<double>(7, 1));
-    dgSPA.add_vertex(vertex<double>(8, 1));
-    dgSPA.add_vertex(vertex<double>(9, 1));
+    // dgSPA.add_vertex(vertex<double>(0, 1));
+    // dgSPA.add_vertex(vertex<double>(1, 1));
+    // dgSPA.add_vertex(vertex<double>(2, 1));
+    // dgSPA.add_vertex(vertex<double>(3, 1));
+    // dgSPA.add_vertex(vertex<double>(4, 1));
+    // dgSPA.add_vertex(vertex<double>(5, 1));
+    // dgSPA.add_vertex(vertex<double>(6, 1));
+    // dgSPA.add_vertex(vertex<double>(7, 1));
+    // dgSPA.add_vertex(vertex<double>(8, 1));
+    // dgSPA.add_vertex(vertex<double>(9, 1));
 
-    dgSPA.add_edge(1, 5, 4);
-    dgSPA.add_edge(1, 4, 6);
-    dgSPA.add_edge(4, 0, 3);
-    dgSPA.add_edge(4, 3, 2);
-    dgSPA.add_edge(0, 3, 1);
-    dgSPA.add_edge(3, 7, 5);
-    dgSPA.add_edge(4, 2, 3);
-    dgSPA.add_edge(2, 7, 3);
-    dgSPA.add_edge(7, 6, 2);
-    dgSPA.add_edge(6, 8, 1);
-    dgSPA.add_edge(7, 8, 4);
+    // dgSPA.add_edge(1, 5, 4);
+    // dgSPA.add_edge(1, 4, 6);
+    // dgSPA.add_edge(4, 0, 3);
+    // dgSPA.add_edge(4, 3, 2);
+    // dgSPA.add_edge(0, 3, 1);
+    // dgSPA.add_edge(3, 7, 5);
+    // dgSPA.add_edge(4, 2, 3);
+    // dgSPA.add_edge(2, 7, 3);
+    // dgSPA.add_edge(7, 6, 2);
+    // dgSPA.add_edge(6, 8, 1);
+    // dgSPA.add_edge(7, 8, 4);
 
-    int startNode = 1;
-    int endNode = 8;
-    vector<vertex<double>> sp = shortest_path(dgSPA, startNode, endNode);
-    for (auto v : sp)
-    {
-        cout << v.id;
-    }
+    // int startNode = 1;
+    // int endNode = 8;
+    // vector<vertex<double>> sp = shortest_path(dgSPA, startNode, endNode);
+    // for (auto v : sp)
+    // {
+    //     cout << v.id;
+    // }
     cout << endl;
     cout << endl;
     cout << endl;

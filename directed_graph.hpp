@@ -70,7 +70,7 @@ public:
     vector<vertex<T>> breadth_first(const int &); //Returns the vertices of the graph in the order they are visisted in by a breadth-first traversal starting at the given vertex.
 
     directed_graph<T> out_tree(const int &); //Returns a spanning tree of the graph starting at the given vertex using the out-edges. This means every vertex in the tree is reachable from the root.
-    directed_graph<T> getTransposeGraph();   //Returns the transpose graph of this graph.
+    directed_graph<T> get_transpose_graph(); //Returns the transpose graph of this graph.
 
     vector<vertex<T>> pre_order_traversal(const int &, directed_graph<T> &);  // returns the vertices in the visiting order of a pre-order traversal of the minimum spanning tree starting at the given vertex.
     vector<vertex<T>> in_order_traversal(const int &, directed_graph<T> &);   // returns the vertices in the visiting order of an in-order traversal of the minimum spanning tree starting at the given vertex.
@@ -78,9 +78,9 @@ public:
 
     vector<vertex<T>> significance_sorting(); // Return a vector containing a sorted list of the vertices in descending order of their significance.
     void fillOrder(int &, bool[], stack<int> &);
-    void DFSUtil(int &, bool[]);
-    void dfs(int &, bool[], vector<int> &, vector<int>);
-    T get_edge_weight(T, T);
+    void dfs_scc(int &, bool[], vector<vertex<T>> &);
+    void dfs_topsort(int &, bool[], vector<int> &, vector<int>);
+    int get_edge_weight(int, int);
     int get_node(const int &, vector<int>);
 
     unordered_map<int, unordered_map<int, T>> get_adj_list();
@@ -418,14 +418,14 @@ directed_graph<T> directed_graph<T>::out_tree(const int &u_id)
 template <typename T>
 void directed_graph<T>::display_tree()
 {
-    cout << "display tree:" << endl;
+    // cout << "display tree:" << endl;
 
     for (auto node : adj_list)
     {
-        cout << "  Vertex: " << node.first << endl;
+        // cout << "  Vertex: " << node.first << endl;
         for (auto edge : node.second)
         {
-            cout << "    Edge: " << node.first << "----(" << edge.second << ")---->" << edge.first << endl;
+            // cout << "    Edge: " << node.first << "----(" << edge.second << ")---->" << edge.first << endl;
             //cout << "    Edge Weight (edge.second): " << edge.second << endl;
         }
     }
@@ -828,12 +828,15 @@ vector<vertex<T>> directed_graph<T>::significance_sorting()
     return vector_of_nodes;
 }
 
+// =====================================================
+// Assignment 2 functions
+// =====================================================
+
 template <typename T>
-directed_graph<T> directed_graph<T>::getTransposeGraph()
+directed_graph<T> directed_graph<T>::get_transpose_graph()
 {
     directed_graph<T> transposeGraph;
 
-    // Populate graph with vertex's
     for (auto x : adj_list)
     {
         transposeGraph.add_vertex(vertex<T>(x.first, 0));
@@ -841,59 +844,58 @@ directed_graph<T> directed_graph<T>::getTransposeGraph()
 
     for (auto v : adj_list)
     {
+        // Populate graph with vertex's
         for (auto edge : v.second)
         {
             transposeGraph.add_edge(edge.first, v.first, edge.second);
         }
     }
-
     return transposeGraph;
 }
 
 template <typename T>
 void directed_graph<T>::fillOrder(int &startNode, bool visitedNodes[], stack<int> &nodeStack)
 {
-
-    // Mark the current node as visited and print it
     int V = get_vertices().size();
     vector<vertex<T>> verticesInGraph = get_vertices();
-
+    // Mark the current node as visited
     visitedNodes[startNode] = true;
-
     vector<vertex<T>> children = get_neighbours(verticesInGraph[startNode].id);
 
+    // This part is basically the same structure as a standard DFS
     for (int i = 0; i < children.size(); i++)
     {
+        // for each node, check if the child is that node
         for (int j = 0; j < V; j++)
             if (children[i].id == verticesInGraph[j].id)
             {
-
+                // if child and vertex are equal then check if it's been visited
+                // then run fillOrder again
                 if (!visitedNodes[j])
                 {
                     fillOrder(j, visitedNodes, nodeStack);
                 }
             }
     }
-
-    cout << "Pushing " << verticesInGraph[startNode].id << " to stack" << endl;
+    // Push this node into the stack
     nodeStack.push(verticesInGraph[startNode].id);
 }
 
 template <typename T>
-void directed_graph<T>::DFSUtil(int &startNode, bool visitedNodes[])
+void directed_graph<T>::dfs_scc(int &startNode, bool visitedNodes[], vector<vertex<T>> &result)
 {
     int V = get_vertices().size();
-
     vector<vertex<T>> verticesInGraph = get_vertices();
 
     // Mark current node as visited
     visitedNodes[startNode] = true;
 
-    // Add node to list
-    cout << "v" << verticesInGraph[startNode].id << ", ";
+    // Add node to vector of results
+    result.push_back(verticesInGraph[startNode]);
 
     vector<vertex<T>> children = get_neighbours(verticesInGraph[startNode].id);
 
+    // Run Depth First Search recursively
     for (int i = 0; i < children.size(); i++)
     {
         for (int j = 0; j < V; j++)
@@ -902,7 +904,7 @@ void directed_graph<T>::DFSUtil(int &startNode, bool visitedNodes[])
             {
                 if (!visitedNodes[j])
                 {
-                    DFSUtil(j, visitedNodes);
+                    dfs_scc(j, visitedNodes, result);
                 }
             }
         }
@@ -910,19 +912,19 @@ void directed_graph<T>::DFSUtil(int &startNode, bool visitedNodes[])
 }
 
 template <typename T>
-void directed_graph<T>::dfs(int &currentNode, bool visited[], vector<int> &visitedNodes, vector<int> nodeVertexMap)
+void directed_graph<T>::dfs_topsort(int &currentNode, bool visited[], vector<int> &visitedNodes, vector<int> nodeVertexMap)
 {
     visited[currentNode] = true;
     vector<vertex<T>> edges = get_neighbours(get_vertices()[currentNode].id);
 
+    // Run dfs
     for (auto edge : edges)
     {
-        // Converting edge vertex from value to node (aka index)
-        vector<int>::iterator it = find(nodeVertexMap.begin(), nodeVertexMap.end(), edge.id);
-        int edgeNode = distance(nodeVertexMap.begin(), it);
+        // Converting edge vertex from value to node using nodeVertexMap
+        int edgeNode = get_node(edge.id, nodeVertexMap);
         if (visited[edgeNode] == false)
         {
-            dfs(edgeNode, visited, visitedNodes, nodeVertexMap);
+            dfs_topsort(edgeNode, visited, visitedNodes, nodeVertexMap);
         }
     }
 
@@ -930,7 +932,7 @@ void directed_graph<T>::dfs(int &currentNode, bool visited[], vector<int> &visit
 }
 
 template <typename T>
-T directed_graph<T>::get_edge_weight(T u, T v)
+int directed_graph<T>::get_edge_weight(int u, int v)
 {
     for (auto vertex : adj_list)
     {
@@ -955,11 +957,10 @@ unordered_map<int, unordered_map<int, T>> directed_graph<T>::get_adj_list()
     return adj_list;
 }
 
+// Using a Node Vertex Map this function returns the index of the value it's given
 template <typename T>
 int directed_graph<T>::get_node(const int &u_id, vector<int> nodeVertexMap)
 {
-    vector<int>::iterator it = find(nodeVertexMap.begin(), nodeVertexMap.end(), u_id);
-
-    return distance(nodeVertexMap.begin(), it);
+    return distance(nodeVertexMap.begin(), find(nodeVertexMap.begin(), nodeVertexMap.end(), u_id));
 }
 #endif
