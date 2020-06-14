@@ -31,16 +31,20 @@ using namespace std;
 template <typename T>
 vector<vertex<T>> shortest_path(directed_graph<T> &graph, int &u_id, int &v_id)
 {
+    int INFINITY = 999999;
+    vector<vertex<T>> result;
     vector<int> nodeVertexMap;
     int V = graph.get_vertices().size();
     // Create Distance array and set all distances to positive infinity, and 0 for u_id
     int dist[V];
+    int prevNode[V];
     // Create visited array and mark all as unvisited
     bool *visited = new bool[V];
     for (int i = 0; i < V; i++)
     {
         visited[i] = false;
-        dist[i] = 9999; //Infinity
+        dist[i] = INFINITY; //Infinity
+        prevNode[i] = -1;
         cout << "pushing this into node vertex map: " << graph.get_vertices()[i].id << endl;
         nodeVertexMap.push_back(graph.get_vertices()[i].id);
     }
@@ -50,8 +54,10 @@ vector<vertex<T>> shortest_path(directed_graph<T> &graph, int &u_id, int &v_id)
     // Set the start node distance to value of 0
     dist[currentNode] = 0;
 
-    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
-    pq.push(pair<int, int>(currentNode, 0));
+    priority_queue<int, vector<int>, greater<int>> pqNode;
+    priority_queue<int, vector<int>, greater<int>> pqDist;
+    pqNode.push(currentNode);
+    pqDist.push(0);
 
     // ----- CHECKING EVERTYHING
     for (int i = 0; i < V; i++)
@@ -64,55 +70,61 @@ vector<vertex<T>> shortest_path(directed_graph<T> &graph, int &u_id, int &v_id)
     cout << "int currentNode = " << currentNode << endl;
 
     // While there are unvisited vertices
-    while (!pq.empty())
+    while (!pqNode.empty())
     {
         cout << "While loop start" << endl;
 
-        int index = pq.top().first;
-        pq.pop();
+        int index = pqNode.top();
+        pqNode.pop();
+        pqDist.pop();
 
         cout << "Index = " << index << endl;
 
         visited[index] = true;
 
-        
-
-        for (auto sourceNode : graph.get_adj_list())
+        // if (pqDist.top() > dist[index])
+        for (auto neighbour : graph.get_neighbours(nodeVertexMap[index]))
         {
-            for (auto destNode : sourceNode.second)
-            {
 
-                int destNodeID = graph.get_node(destNode.first, nodeVertexMap);
-                if (!visited[destNodeID])
-                {
-                    int newDist = dist[index] + graph.get_edge_weight(sourceNode.first, destNode.first);
-                    if (newDist < dist[destNodeID])
-                    {
-                        dist[destNodeID] = newDist;
-                        pq.push(pair<int, int>(destNodeID, newDist));
-                        cout << "destNodeID: " << destNodeID << "   newDist: " << newDist << endl;
-                    }
-                }
+            cout << "Neigbour value =  " << neighbour.id << endl;
+            int neighbourNode = graph.get_node(neighbour.id, nodeVertexMap);
+
+            // if (!visited[neighbourNode])
+            // {
+            int newDist = dist[index] + graph.get_edge_weight(nodeVertexMap[index], neighbour.id);
+            if (newDist < dist[neighbourNode])
+            {
+                prevNode[neighbourNode] = index;
+                dist[neighbourNode] = newDist;
+                pqNode.push(neighbourNode);
+                pqDist.push(newDist);
+
+                cout << "Neighbour Node: " << neighbourNode << "   newDist: " << newDist << endl;
             }
+            // }
         }
     }
+    // b4 going further lets see what we got for prevNode
 
-    cout << "do stuff" << endl;
-    for (int i = 0; i < sizeof(dist); i++)
+    // From this point we are going to work out path
+
+    vector<int> path;
+
+    // Now we need to find the shortest path dist to v_id (vertex value) ... look this up in neighbourNode (use getNode)
+    // We are doing this so that if it's 9999 we can stop now as there is no path
+
+    int FinalNode = graph.get_node(v_id, nodeVertexMap);
+    if (dist[FinalNode] == INFINITY)
+        return vector<vertex<T>>();
+    for (int at = FinalNode; at != -1; at = prevNode[at])
     {
-        cout << dist[i] << endl;
+        cout << "at: " << at << endl;
+        result.push_back(graph.get_vertex(nodeVertexMap[at]));
     }
-    // For each unvisited neighbour of the current vertex
-    // Compare the distance of each neighbour to the distance to current plus the edge weight
-    // of the edge joinging them
 
-    // Keep whichever is smaller
+    reverse(result.begin(), result.end());
 
-    // Mark the current vertex as visited
-
-    // Select the unvisted vertext with the smallest tentative distance and set it as the current vertex
-
-    return vector<vertex<T>>();
+    return result;
 }
 
 /*
@@ -297,6 +309,10 @@ vector<vertex<T>> topological_sort(directed_graph<T> &graph)
  * vertices denote cities; vertex weights denote cities' population;
  * edge weights denote the fixed delivery cost between cities, which is irrelevant to 
  * the amount of goods being delivered. 
+
+
+
+ 
  */
 template <typename T>
 T low_cost_delivery(directed_graph<T> &graph, int &u_id)

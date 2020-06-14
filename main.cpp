@@ -293,28 +293,58 @@ int main()
     //     cout << node.id;
     // }
 
+    // directed_graph<double> dgSPA;
+
+    // vertex<double> v1 = vertex<double>(0, 1);
+    // vertex<double> v5 = vertex<double>(4, 1);
+
+    // dgSPA.add_vertex(vertex<double>(0, 1));
+    // dgSPA.add_vertex(vertex<double>(1, 1));
+    // dgSPA.add_vertex(vertex<double>(2, 1));
+    // dgSPA.add_vertex(vertex<double>(3, 1));
+    // dgSPA.add_vertex(vertex<double>(4, 1));
+
+    // dgSPA.add_edge(0, 2, 1);
+    // dgSPA.add_edge(0, 1, 4);
+    // dgSPA.add_edge(1, 3, 1);
+    // dgSPA.add_edge(2, 1, 2);
+    // dgSPA.add_edge(2, 3, 5);
+    // dgSPA.add_edge(3, 4, 3);
     directed_graph<double> dgSPA;
 
-    vertex<double> v1 = vertex<double>(0, 1);
-    vertex<double> v5 = vertex<double>(4, 1);
+    vertex<double> v1 = vertex<double>(1, 1);
+    vertex<double> v5 = vertex<double>(8, 1);
 
     dgSPA.add_vertex(vertex<double>(0, 1));
     dgSPA.add_vertex(vertex<double>(1, 1));
     dgSPA.add_vertex(vertex<double>(2, 1));
     dgSPA.add_vertex(vertex<double>(3, 1));
     dgSPA.add_vertex(vertex<double>(4, 1));
+    dgSPA.add_vertex(vertex<double>(5, 1));
+    dgSPA.add_vertex(vertex<double>(6, 1));
+    dgSPA.add_vertex(vertex<double>(7, 1));
+    dgSPA.add_vertex(vertex<double>(8, 1));
+    dgSPA.add_vertex(vertex<double>(9, 1));
 
-    dgSPA.add_edge(0, 2, 1);
-    dgSPA.add_edge(0, 1, 4);
-    dgSPA.add_edge(1, 3, 1);
-    dgSPA.add_edge(2, 1, 2);
-    dgSPA.add_edge(2, 3, 5);
-    dgSPA.add_edge(3, 4, 3);
+    dgSPA.add_edge(1, 5, 4);
+    dgSPA.add_edge(1, 4, 6);
+    dgSPA.add_edge(4, 0, 3);
+    dgSPA.add_edge(4, 3, 2);
+    dgSPA.add_edge(0, 3, 1);
+    dgSPA.add_edge(3, 7, 5);
+    dgSPA.add_edge(4, 2, 3);
+    dgSPA.add_edge(2, 7, 3);
+    dgSPA.add_edge(7, 6, 2);
+    dgSPA.add_edge(6, 8, 1);
+    dgSPA.add_edge(7, 8, 4);
 
-    int startNode = 0;
-    int endNode = 4;
-    shortest_path(dgSPA, startNode, endNode);
-
+    int startNode = 1;
+    int endNode = 8;
+    vector<vertex<double>> sp = shortest_path(dgSPA, startNode, endNode);
+    for (auto v : sp)
+    {
+        cout << v.id;
+    }
     cout << endl;
     cout << endl;
     cout << endl;
